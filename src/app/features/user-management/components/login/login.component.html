@@ -1,0 +1,118 @@
+<div class="min-vh-100 d-flex align-items-center justify-content-center bg-light">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-6 col-lg-4">
+        <div class="card shadow-lg border-0">
+          <div class="card-body p-5">
+            <div class="text-center mb-4">
+              <div
+                class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                style="width: 60px; height: 60px"
+              >
+                <i class="bi bi-check2-square text-white fs-4"></i>
+              </div>
+              <h3 class="fw-bold text-dark mb-2">Task Management</h3>
+              <p class="text-muted">Sign in to your account</p>
+            </div>
+
+            <form
+              [formGroup]="loginForm"
+              (ngSubmit)="onSubmit()"
+            >
+              <div class="mb-3">
+                <label
+                  for="username"
+                  class="form-label"
+                >
+                  <i class="bi bi-person me-1"></i>Username
+                </label>
+                <input
+                  type="text"
+                  id="username"
+                  formControlName="username"
+                  class="form-control form-control-lg"
+                  [class.is-invalid]="loginForm.get('username')?.invalid && submitted()"
+                  placeholder="Enter your username"
+                />
+                @if (loginForm.get('username')?.invalid && submitted()) {
+                  <div class="invalid-feedback">Username is required</div>
+                }
+              </div>
+
+              <div class="mb-4">
+                <label
+                  for="password"
+                  class="form-label"
+                >
+                  <i class="bi bi-lock me-1"></i>Password
+                </label>
+                <div class="position-relative">
+                  <input
+                    [type]="showPassword() ? 'text' : 'password'"
+                    id="password"
+                    formControlName="password"
+                    class="form-control form-control-lg pe-5"
+                    [class.is-invalid]="loginForm.get('password')?.invalid && submitted()"
+                    placeholder="Enter your password"
+                  />
+                  <button
+                    type="button"
+                    class="btn btn-link position-absolute top-50 end-0 translate-middle-y"
+                    [class.pe-3]="!loginForm.get('password')?.invalid || !submitted()"
+                    [class.pe-5]="loginForm.get('password')?.invalid && submitted()"
+                    (click)="togglePasswordVisibility()"
+                    style="border: none; background: none; color: #6c757d"
+                  >
+                    <i [class]="showPassword() ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+                  </button>
+                </div>
+                @if (loginForm.get('password')?.invalid && submitted()) {
+                  <div class="invalid-feedback">Password is required</div>
+                }
+              </div>
+
+              @if (errorMessage()) {
+                <div
+                  class="alert alert-danger d-flex align-items-center"
+                  role="alert"
+                >
+                  <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                  {{ errorMessage() }}
+                </div>
+              }
+
+              <div class="d-grid">
+                <button
+                  type="submit"
+                  [disabled]="loading()"
+                  class="btn btn-primary btn-lg"
+                >
+                  @if (loading()) {
+                    <span
+                      class="spinner-border spinner-border-sm me-2"
+                      role="status"
+                    ></span>
+                    Signing in...
+                  } @else {
+                    <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+                  }
+                </button>
+              </div>
+            </form>
+
+            <div class="text-center mt-4 pt-3 border-top">
+              <p class="text-muted mb-0">
+                Don't have an account?
+                <a
+                  routerLink="/register"
+                  class="text-decoration-none fw-medium"
+                  >Sign up</a
+                >
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
