@@ -1,25 +1,20 @@
 {
   "name": "task-management-app",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "scripts": {
-    "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
-    "watch": "ng build --watch --configuration development",
-    "test": "ng test",
-    "serve:ssr:TaskManagementApp": "node dist/TaskManagementApp/server/server.mjs"
-  },
-  "prettier": {
-    "printWidth": 100,
-    "singleQuote": true,
-    "overrides": [
-      {
-        "files": "*.html",
-        "options": {
-          "parser": "angular"
-        }
-      }
-    ]
+    "ng": "npx ng",
+    "start": "npx ng serve --configuration development",
+    "start:dev": "npx ng serve --configuration development",
+    "start:prod": "npx ng serve --configuration production",
+    "build": "npx ng build --configuration production",
+    "build:dev": "npx ng build --configuration development",
+    "build:prod": "npx ng build --configuration production",
+    "watch": "npx ng build --watch --configuration development",
+    "test": "npx ng test",
+    "serve:ssr:TaskManagementApp": "node dist/TaskManagementApp/server/server.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "npx ng lint"
   },
   "private": true,
   "dependencies": {
@@ -31,6 +26,8 @@
     "@angular/platform-server": "^20.3.0",
     "@angular/router": "^20.3.0",
     "@angular/ssr": "^20.3.5",
+    "bootstrap": "^5.3.8",
+    "bootstrap-icons": "^1.13.1",
     "express": "^5.1.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
@@ -42,12 +39,16 @@
     "@types/express": "^5.0.1",
     "@types/jasmine": "~5.1.0",
     "@types/node": "^20.17.19",
+    "angular-eslint": "20.4.0",
+    "eslint": "^9.37.0",
     "jasmine-core": "~5.9.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "typescript": "~5.9.2"
+    "prettier": "^3.6.2",
+    "typescript": "~5.9.2",
+    "typescript-eslint": "8.46.0"
   }
 }
