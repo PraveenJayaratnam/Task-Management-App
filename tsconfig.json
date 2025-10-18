@@ -9,9 +9,11 @@
     "skipLibCheck": true,
     "isolatedModules": true,
     "experimentalDecorators": true,
+    "esModuleInterop": true,
     "importHelpers": true,
     "target": "ES2022",
-    "module": "preserve",
+    "module": "esnext",
+    "moduleResolution": "node",
     "baseUrl": "./",
     "paths": {
       "@features/*": ["src/app/features/index.ts"],
