@@ -64,6 +64,27 @@
         </div>
       </div>
 
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label
+            for="priority"
+            class="form-label"
+          >
+            <i class="bi bi-exclamation-triangle me-1"></i>Priority
+          </label>
+          <select
+            id="priority"
+            formControlName="priority"
+            class="form-select"
+          >
+            <option value="">Select Priority</option>
+            @for (option of taskPriorityOptions; track option.value) {
+              <option [value]="option.value">{{ option.label }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
       <div class="mb-3">
         <label
           for="description"

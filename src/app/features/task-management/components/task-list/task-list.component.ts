@@ -1,7 +1,13 @@
 import { DatePipe } from '@angular/common';
 import { Component, inject, input, OnInit, output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { Task, TASK_STATUS_OPTIONS, TaskStatus } from '@features/task-management/models';
+import {
+  Task,
+  TASK_PRIORITY_OPTIONS,
+  TASK_STATUS_OPTIONS,
+  TaskPriority,
+  TaskStatus,
+} from '@features/task-management/models';
 import { DataResponse } from '@shared/models';
 
 @Component({
@@ -28,6 +34,7 @@ export class TaskListComponent implements OnInit {
   filterForm!: FormGroup;
   Math = Math;
   taskStatusOptions = TASK_STATUS_OPTIONS;
+  taskPriorityOptions = TASK_PRIORITY_OPTIONS;
 
   #fb = inject(FormBuilder);
 
@@ -94,6 +101,18 @@ export class TaskListComponent implements OnInit {
 
   getStatusLabel(status: TaskStatus): string {
     const option = this.taskStatusOptions.find((opt) => opt.value === status);
+    return option?.label || 'Unknown';
+  }
+
+  getPriorityClass(priority: TaskPriority | undefined): string {
+    if (priority === undefined) return 'secondary';
+    const option = this.taskPriorityOptions.find((opt) => opt.value === priority);
+    return option?.cssClass || 'secondary';
+  }
+
+  getPriorityLabel(priority: TaskPriority | undefined): string {
+    if (priority === undefined) return 'Not Set';
+    const option = this.taskPriorityOptions.find((opt) => opt.value === priority);
     return option?.label || 'Unknown';
   }
 }

@@ -50,6 +50,7 @@
             <th>Title</th>
             <th>Description</th>
             <th>Status</th>
+            <th>Priority</th>
             <th>Due Date</th>
             <th>Actions</th>
           </tr>
@@ -58,7 +59,7 @@
           @if (tasks().length === 0) {
             <tr>
               <td
-                colspan="5"
+                colspan="6"
                 class="text-center text-muted py-4"
               >
                 <i class="bi bi-inbox display-6 d-block mb-2"></i>
@@ -76,6 +77,14 @@
                     [class]="'bg-' + getStatusClass(task.status)"
                   >
                     {{ getStatusLabel(task.status) }}
+                  </span>
+                </td>
+                <td>
+                  <span
+                    class="badge"
+                    [class]="'bg-' + getPriorityClass(task.priority)"
+                  >
+                    {{ getPriorityLabel(task.priority) }}
                   </span>
                 </td>
                 <td>
