@@ -1,3 +1,5 @@
+import { BaseEntity } from '@core/models';
+
 export enum TaskStatus {
   Pending = 1,
   InProgress = 2,
@@ -18,17 +20,23 @@ export const TASK_STATUS_OPTIONS: TaskStatusOption[] = [
   { value: TaskStatus.Cancelled, label: 'Cancelled', cssClass: 'danger' },
 ];
 
-export interface Task {
-  id?: string;
+export interface Task extends BaseEntity {
   title: string;
   description?: string;
   status: TaskStatus;
   dueDate?: string;
 }
 
-export interface TaskEntity extends Task {
-  createdAt: string;
-  updatedAt: string;
-  createdBy: string;
-  updatedBy: string;
+export interface CreateTask {
+  title: string;
+  description?: string;
+  status: TaskStatus;
+  dueDate?: string;
+}
+
+export interface UpdateTask {
+  title?: string;
+  description?: string;
+  status?: TaskStatus;
+  dueDate?: string;
 }

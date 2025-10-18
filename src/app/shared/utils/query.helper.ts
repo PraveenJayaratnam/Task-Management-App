@@ -1,24 +1,23 @@
-import { PaginationRequest } from '../models';
+import { Filter } from '@shared/models';
 
 export class QueryHelper {
-  static buildPaginationQuery(paginationRequest: PaginationRequest): string {
+  static buildQuery<T>(filter?: Filter<T>): string {
+    if (!filter) {
+      return '';
+    }
+
     const params = new URLSearchParams();
 
-    params.set('pageIndex', paginationRequest.pageIndex.toString());
-    params.set('pageSize', paginationRequest.pageSize.toString());
-
-    if (paginationRequest.sortBy) {
-      params.set('sortBy', paginationRequest.sortBy);
-    }
-
-    if (paginationRequest.sortDirection) {
-      params.set('sortDirection', paginationRequest.sortDirection);
-    }
-
-    if (paginationRequest.searchTerm) {
-      params.set('searchTerm', paginationRequest.searchTerm);
-    }
+    Object.entries(filter).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        params.set(key, value.toString());
+      }
+    });
 
     return params.toString();
+  }
+
+  static buildPaginationQuery<T>(paginationRequest: Filter<T>): string {
+    return this.buildQuery(paginationRequest);
   }
 }

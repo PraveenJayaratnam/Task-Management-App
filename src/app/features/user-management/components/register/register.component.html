@@ -77,12 +77,29 @@
                   formControlName="username"
                   class="form-control"
                   [class.is-invalid]="
-                    registerForm.get('username')?.invalid && submitted()
+                    usernameControl?.invalid && (submitted() || usernameControl?.touched)
                   "
                   placeholder="Choose a username"
                 />
-                @if (registerForm.get('username')?.invalid && submitted()) {
+                @if (
+                  usernameControl?.hasError('required') &&
+                  (submitted() || usernameControl?.touched)
+                ) {
                   <div class="invalid-feedback">Username is required</div>
+                }
+                @if (
+                  usernameControl?.hasError('usernameExists') &&
+                  (submitted() || usernameControl?.touched)
+                ) {
+                  <div class="invalid-feedback">
+                    Username already exists. Please choose a different one.
+                  </div>
+                }
+                @if (usernameControl?.pending) {
+                  <div class="text-muted small">
+                    <i class="bi bi-hourglass-split me-1"></i>Checking username
+                    availability...
+                  </div>
                 }
               </div>
 

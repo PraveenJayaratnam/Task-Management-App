@@ -7,19 +7,19 @@ export abstract class BaseApiService {
   protected http = inject(HttpClient);
   protected baseUrl = environment.apiUrl;
 
-  get<T>(url: string): Observable<T> {
+  getEntity<T>(url: string): Observable<T> {
     return this.http.get<T>(`${this.baseUrl}/${url}`);
   }
 
-  post<T>(url: string, data: unknown): Observable<T> {
+  postEntity<T>(url: string, data: unknown): Observable<T> {
     return this.http.post<T>(`${this.baseUrl}/${url}`, data);
   }
 
-  put<T>(url: string, data: unknown): Observable<T> {
+  putEntity<T>(url: string, data: unknown): Observable<T> {
     return this.http.put<T>(`${this.baseUrl}/${url}`, data);
   }
 
-  delete<T>(url: string): Observable<T> {
+  deleteEntity<T>(url: string): Observable<T> {
     return this.http.delete<T>(`${this.baseUrl}/${url}`);
   }
 }
