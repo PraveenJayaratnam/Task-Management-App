@@ -1,6 +1,5 @@
-export interface Filter<T = unknown> {
+export interface Filter {
   userId?: string;
-  status?: T;
   searchTerm?: string;
   pageIndex?: number;
   pageSize?: number;

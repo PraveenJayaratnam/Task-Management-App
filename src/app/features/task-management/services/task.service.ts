@@ -2,10 +2,10 @@ import { Injectable } from '@angular/core';
 import {
   CreateTask,
   Task,
-  TaskStatus,
+  TaskFilter,
   UpdateTask,
 } from '@features/task-management/models';
-import { DataResponse, Filter } from '@shared/models';
+import { DataResponse } from '@shared/models';
 import { BaseApiService } from '@shared/services';
 import { QueryHelper } from '@shared/utils';
 import { Observable } from 'rxjs';
@@ -18,7 +18,7 @@ export class TaskService extends BaseApiService {
     return this.getEntity<Task[]>(this.#baseUrl);
   }
 
-  getList(filter?: Filter<TaskStatus>): Observable<DataResponse<Task>> {
+  getList(filter?: TaskFilter): Observable<DataResponse<Task>> {
     const queryString = QueryHelper.buildQuery(filter);
     const url = queryString ? `${this.#baseUrl}?${queryString}` : this.#baseUrl;
     return this.getEntity<DataResponse<Task>>(url);
