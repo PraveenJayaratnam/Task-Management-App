@@ -1,8 +1,8 @@
 import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { AuthService } from '@core/services';
-import { Task, TaskStatus } from '@features/task-management/models';
+import { Task, TaskFilter } from '@features/task-management/models';
 import { TaskService } from '@features/task-management/services';
-import { DataResponse, Filter } from '@shared/models';
+import { DataResponse } from '@shared/models';
 import { Subscription } from 'rxjs';
 import { TaskFormComponent, TaskListComponent } from '../';
 
@@ -33,7 +33,7 @@ export class TaskManagementComponent implements OnInit, OnDestroy {
   #taskService = inject(TaskService);
   #subscriptions = new Set<Subscription>();
 
-  #appliedFilter: Filter<TaskStatus> = {
+  #appliedFilter: TaskFilter = {
     pageIndex: 0,
     pageSize: 10,
     sortBy: '',

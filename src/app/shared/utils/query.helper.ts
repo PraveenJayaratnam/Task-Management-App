@@ -1,7 +1,7 @@
 import { Filter } from '@shared/models';
 
 export class QueryHelper {
-  static buildQuery<T>(filter?: Filter<T>): string {
+  static buildQuery(filter?: Filter): string {
     if (!filter) {
       return '';
     }
@@ -17,7 +17,7 @@ export class QueryHelper {
     return params.toString();
   }
 
-  static buildPaginationQuery<T>(paginationRequest: Filter<T>): string {
+  static buildPaginationQuery(paginationRequest: Filter): string {
     return this.buildQuery(paginationRequest);
   }
 }
