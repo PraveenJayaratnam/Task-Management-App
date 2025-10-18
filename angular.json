@@ -33,6 +33,7 @@
               }
             ],
             "styles": ["src/styles.scss"],
+            "polyfills": ["zone.js"],
             "server": "src/main.server.ts",
             "outputMode": "server",
             "ssr": {
