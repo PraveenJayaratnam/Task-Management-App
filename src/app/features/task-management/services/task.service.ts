@@ -1,6 +1,11 @@
 import { Injectable } from '@angular/core';
-import { Task } from '@features/task-management/models';
-import { DataResponse, PaginationRequest } from '@shared/models';
+import {
+  CreateTask,
+  Task,
+  TaskStatus,
+  UpdateTask,
+} from '@features/task-management/models';
+import { DataResponse, Filter } from '@shared/models';
 import { BaseApiService } from '@shared/services';
 import { QueryHelper } from '@shared/utils';
 import { Observable } from 'rxjs';
@@ -10,23 +15,36 @@ export class TaskService extends BaseApiService {
   #baseUrl = 'tasks';
 
   getAll(): Observable<Task[]> {
-    return this.get<Task[]>(`${this.#baseUrl}/get-all`);
+    return this.getEntity<Task[]>(this.#baseUrl);
   }
 
-  getList(paginationRequest: PaginationRequest): Observable<DataResponse<Task>> {
-    const params = QueryHelper.buildPaginationQuery(paginationRequest);
-    return this.get<DataResponse<Task>>(`${this.#baseUrl}/list?${params}`);
+  getList(filter?: Filter<TaskStatus>): Observable<DataResponse<Task>> {
+    const queryString = QueryHelper.buildQuery(filter);
+    const url = queryString ? `${this.#baseUrl}?${queryString}` : this.#baseUrl;
+    return this.getEntity<DataResponse<Task>>(url);
   }
 
-  create(task: Task): Observable<Task> {
-    return this.post<Task>(`${this.#baseUrl}/create`, task);
+  getById(id: string): Observable<Task> {
+    return this.getEntity<Task>(`${this.#baseUrl}/${id}`);
   }
 
-  update(id: number, task: Task): Observable<Task> {
-    return this.put<Task>(`${this.#baseUrl}/update/${id}`, task);
+  create(createTask: CreateTask): Observable<Task> {
+    return this.postEntity<Task>(this.#baseUrl, createTask);
   }
 
-  remove(id: string): Observable<Task> {
-    return this.delete<Task>(`${this.#baseUrl}/delete/${id}`);
+  update(id: string, updateTask: UpdateTask): Observable<Task> {
+    return this.putEntity<Task>(`${this.#baseUrl}/${id}`, updateTask);
+  }
+
+  delete(id: string): Observable<void> {
+    return this.deleteEntity<void>(`${this.#baseUrl}/${id}`);
+  }
+
+  remove(id: string): Observable<void> {
+    return this.deleteEntity<void>(`${this.#baseUrl}/${id}`);
+  }
+
+  getTasksByUser(userId: string): Observable<Task[]> {
+    return this.getEntity<Task[]>(`${this.#baseUrl}/user/${userId}`);
   }
 }

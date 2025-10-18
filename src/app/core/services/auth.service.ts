@@ -23,7 +23,7 @@ export class AuthService extends BaseApiService {
   }
 
   login(loginRequest: LoginRequest) {
-    return this.post<LoginResponse>('auth/login', loginRequest);
+    return this.postEntity<LoginResponse>('auth/login', loginRequest);
   }
 
   setAuthState(loginResponse: LoginResponse) {
@@ -62,7 +62,13 @@ export class AuthService extends BaseApiService {
   }
 
   register(registerRequest: RegisterRequest) {
-    return this.post<User>('auth/register', registerRequest);
+    return this.postEntity<User>('auth/register', registerRequest);
+  }
+
+  checkUsernameExists(username: string) {
+    return this.getEntity<{ exists: boolean; username: string }>(
+      `auth/check-username?username=${encodeURIComponent(username)}`
+    );
   }
 
   clearAuthState() {

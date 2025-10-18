@@ -1,5 +1,6 @@
-export interface User {
-  id: string;
+import { BaseEntity } from './base.model';
+
+export interface User extends BaseEntity {
   username: string;
   firstName?: string;
   lastName?: string;
@@ -19,6 +20,11 @@ export interface LoginResponse {
 export interface RegisterRequest {
   username: string;
   password: string;
+  firstName?: string;
+  lastName?: string;
+}
+
+export interface UpdateUserDto {
   firstName?: string;
   lastName?: string;
 }

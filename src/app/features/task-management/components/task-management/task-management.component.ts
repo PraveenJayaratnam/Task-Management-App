@@ -1,8 +1,8 @@
 import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { AuthService } from '@core/services';
-import { Task } from '@features/task-management/models';
+import { Task, TaskStatus } from '@features/task-management/models';
 import { TaskService } from '@features/task-management/services';
-import { DataResponse, PaginationRequest } from '@shared/models';
+import { DataResponse, Filter } from '@shared/models';
 import { Subscription } from 'rxjs';
 import { TaskFormComponent, TaskListComponent } from '../';
 
@@ -33,7 +33,7 @@ export class TaskManagementComponent implements OnInit, OnDestroy {
   #taskService = inject(TaskService);
   #subscriptions = new Set<Subscription>();
 
-  #currentPagination: PaginationRequest = {
+  #appliedFilter: Filter<TaskStatus> = {
     pageIndex: 0,
     pageSize: 10,
     sortBy: '',
@@ -47,7 +47,7 @@ export class TaskManagementComponent implements OnInit, OnDestroy {
 
   loadTasks() {
     this.loading.set(true);
-    const subscription = this.#taskService.getList(this.#currentPagination).subscribe({
+    const subscription = this.#taskService.getList(this.#appliedFilter).subscribe({
       next: (response: DataResponse<Task>) => {
         this.tasks.set(response.items);
         this.paginationData.set(response);
@@ -75,7 +75,7 @@ export class TaskManagementComponent implements OnInit, OnDestroy {
     this.formLoading.set(true);
 
     const operation = task.id
-      ? this.#taskService.update(Number(task.id), task)
+      ? this.#taskService.update(task.id, task)
       : this.#taskService.create(task);
 
     const subscription = operation.subscribe({
@@ -120,20 +120,20 @@ export class TaskManagementComponent implements OnInit, OnDestroy {
   }
 
   onPageChange(page: number) {
-    this.#currentPagination.pageIndex = page;
+    this.#appliedFilter.pageIndex = page;
     this.loadTasks();
   }
 
   onSearchChange(searchTerm: string) {
-    this.#currentPagination.searchTerm = searchTerm;
-    this.#currentPagination.pageIndex = 0;
+    this.#appliedFilter.searchTerm = searchTerm;
+    this.#appliedFilter.pageIndex = 0;
     this.loadTasks();
   }
 
   onSortChange(sort: { sortBy: string; sortDirection: 'asc' | 'desc' }) {
-    this.#currentPagination.sortBy = sort.sortBy;
-    this.#currentPagination.sortDirection = sort.sortDirection;
-    this.#currentPagination.pageIndex = 0;
+    this.#appliedFilter.sortBy = sort.sortBy;
+    this.#appliedFilter.sortDirection = sort.sortDirection;
+    this.#appliedFilter.pageIndex = 0;
     this.loadTasks();
   }
 
