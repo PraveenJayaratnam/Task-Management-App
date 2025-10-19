@@ -15,13 +15,25 @@ export class TaskService extends BaseApiService {
   #baseUrl = 'tasks';
 
   getAll(): Observable<Task[]> {
-    return this.getEntity<Task[]>(this.#baseUrl);
+    return this.getEntity<Task[]>(`${this.#baseUrl}/queryable`);
+  }
+
+  getAllQueryable(filter?: TaskFilter): Observable<Task[]> {
+    const queryString = QueryHelper.buildQuery(filter);
+    const url = queryString ? `${this.#baseUrl}/queryable?${queryString}` : `${this.#baseUrl}/queryable`;
+    return this.getEntity<Task[]>(url);
   }
 
   getList(filter?: TaskFilter): Observable<DataResponse<Task>> {
     const queryString = QueryHelper.buildQuery(filter);
-    const url = queryString ? `${this.#baseUrl}?${queryString}` : this.#baseUrl;
+    const url = queryString ? `${this.#baseUrl}/paginated?${queryString}` : `${this.#baseUrl}/paginated`;
     return this.getEntity<DataResponse<Task>>(url);
+  }
+
+  getFilteredQueryable(filter?: TaskFilter): Observable<Task[]> {
+    const queryString = QueryHelper.buildQuery(filter);
+    const url = queryString ? `${this.#baseUrl}/queryable?${queryString}` : `${this.#baseUrl}/queryable`;
+    return this.getEntity<Task[]>(url);
   }
 
   getById(id: string): Observable<Task> {
@@ -45,6 +57,6 @@ export class TaskService extends BaseApiService {
   }
 
   getTasksByUser(userId: string): Observable<Task[]> {
-    return this.getEntity<Task[]>(`${this.#baseUrl}/user/${userId}`);
+    return this.getEntity<Task[]>(`${this.#baseUrl}/queryable?userId=${userId}`);
   }
 }

@@ -1,0 +1,515 @@
+@use '../../../../shared/styles/variables' as *;
+
+@mixin pill($bg, $text, $shadow) {
+  background: $bg !important;
+  color: $text !important;
+  font-weight: 600;
+  box-shadow: 0 2px 4px $shadow;
+  .mat-mdc-chip {
+    background: $bg !important;
+    color: $text !important;
+  }
+}
+
+.task-list-container {
+  width: 100%;
+  padding: 0;
+  background: $background-light;
+  min-height: 100vh;
+  margin: 0;
+  display: block;
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+.add-task-header {
+  display: flex;
+  justify-content: flex-end;
+  padding: $spacing-xs $spacing-lg;
+  background: $background-light;
+  border-bottom: 1px solid $border-light;
+
+  @media (min-width: $breakpoint-md) {
+    padding: $spacing-xs $spacing-xl;
+  }
+
+  @media (max-width: $breakpoint-sm) {
+    padding: $spacing-xs;
+    justify-content: center;
+  }
+
+  .add-task-button {
+    height: 40px !important;
+    font-size: 14px !important;
+    padding: 0 16px !important;
+
+    mat-icon {
+      font-size: 18px !important;
+      width: 18px !important;
+      height: 18px !important;
+      margin-right: 6px !important;
+    }
+  }
+}
+
+.filter-section {
+  margin: 0 $spacing-lg $spacing-sm $spacing-lg;
+  padding: $spacing-sm;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+  align-items: stretch;
+  background: $background-secondary;
+  border-radius: $border-radius-small;
+  width: calc(100% - #{$spacing-xl});
+  overflow-x: hidden;
+  max-width: 100%;
+  @media (min-width: $breakpoint-sm) {
+    flex-direction: row;
+    align-items: center;
+    gap: $spacing-xs;
+    padding: $spacing-xs $spacing-sm;
+  }
+  @media (min-width: $breakpoint-md) {
+    margin: 0 $spacing-xl $spacing-sm $spacing-xl;
+    width: calc(100% - #{$spacing-xxl});
+    padding: $spacing-sm;
+  }
+}
+
+.search-field {
+  flex: 1;
+  max-width: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  @media (min-width: $breakpoint-sm) {
+    max-width: 400px;
+  }
+  mat-form-field {
+    width: 100%;
+    .mat-mdc-text-field-wrapper {
+      background: $white;
+      border-radius: $border-radius-small;
+      box-shadow: 0 1px 3px $shadow-light;
+    }
+    .mat-mdc-form-field-outline {
+      color: $primary-color;
+    }
+    .mat-mdc-form-field-outline-thick {
+      color: $primary-dark;
+    }
+    .mat-mdc-form-field-outline-start,
+    .mat-mdc-form-field-outline-end {
+      border-color: $primary-color;
+    }
+  }
+  input {
+    font-size: 16px;
+    &::placeholder {
+      color: #999;
+      font-style: italic;
+    }
+  }
+  mat-icon {
+    color: #666;
+    cursor: pointer;
+    &:hover {
+      color: #007bff;
+    }
+  }
+}
+
+.filter-buttons-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: $spacing-sm;
+  @media (max-width: $breakpoint-sm) {
+    width: 100%;
+    justify-content: stretch;
+    flex-direction: column;
+  }
+}
+
+.button-group {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  @media (max-width: $breakpoint-sm) {
+    width: 100%;
+    justify-content: stretch;
+  }
+}
+
+.reset-filters-button,
+.add-task-button {
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-sm;
+  font-weight: $font-weight-semibold;
+  border-radius: $border-radius-small;
+  transition: all $transition-normal;
+  mat-icon {
+    font-size: $font-size-lg;
+    width: $font-size-lg;
+    height: $font-size-lg;
+    margin-right: $spacing-sm;
+  }
+  @media (max-width: $breakpoint-sm) {
+    width: 100%;
+    margin-top: $spacing-sm;
+  }
+}
+
+.reset-filters-button {
+  min-width: 140px;
+}
+.add-task-button {
+  min-width: 120px;
+}
+
+.small-button {
+  height: 40px !important;
+  min-width: 100px !important;
+  font-size: 14px !important;
+  padding: 0 12px !important;
+
+  mat-icon {
+    font-size: 18px !important;
+    width: 18px !important;
+    height: 18px !important;
+    margin-right: 6px !important;
+  }
+
+  @media (max-width: $breakpoint-sm) {
+    width: 100%;
+    min-width: unset !important;
+  }
+}
+
+.refresh-tasks-button {
+  min-width: 100px !important;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  margin: 0 20px;
+  color: #666;
+  p {
+    margin-top: 16px;
+    font-size: 16px;
+  }
+}
+
+.table-card {
+  margin: 0 20px 20px 20px;
+  width: calc(100% - 40px);
+  display: block;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  mat-card-content {
+    padding: 0;
+  }
+}
+
+.task-table {
+  width: 100%;
+  background: $white;
+  table-layout: fixed;
+  overflow-x: auto;
+  display: block;
+  max-width: 100%;
+  @media (min-width: $breakpoint-md) {
+    display: table;
+    overflow-x: auto;
+  }
+  .mat-mdc-header-cell {
+    background: $background-light;
+    font-weight: $font-weight-semibold;
+    color: $text-primary;
+    border-bottom: 2px solid $border-light;
+    font-size: $mobile-font-size;
+    padding: $spacing-sm;
+    @media (min-width: $breakpoint-sm) {
+      font-size: $font-size-sm;
+      padding: $spacing-md;
+    }
+  }
+  .mat-mdc-row {
+    transition: background-color $transition-fast;
+    &:hover {
+      background: $background-secondary;
+    }
+  }
+  .mat-mdc-cell {
+    padding: $spacing-sm;
+    border-bottom: 1px solid $border-light;
+    font-size: $mobile-font-size;
+    word-wrap: break-word;
+    @media (min-width: $breakpoint-sm) {
+      padding: $spacing-md $spacing-sm;
+      font-size: $font-size-sm;
+    }
+  }
+}
+
+.task-title {
+  font-weight: 500;
+  color: #333;
+  font-size: 16px;
+}
+.task-description {
+  color: #666;
+  font-size: 14px;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.due-date {
+  color: #333;
+  font-weight: 500;
+}
+.no-due-date,
+.no-priority {
+  color: #999;
+  font-style: italic;
+}
+
+.status-warning {
+  @include pill($pill-pending-bg, $pill-pending-text, $pill-pending-shadow);
+}
+.status-info {
+  @include pill($pill-inprogress-bg, $pill-inprogress-text, $pill-inprogress-shadow);
+}
+.status-success {
+  @include pill($pill-completed-bg, $pill-completed-text, $pill-completed-shadow);
+}
+.status-danger {
+  @include pill($pill-cancelled-bg, $pill-cancelled-text, $pill-cancelled-shadow);
+}
+.priority-secondary {
+  @include pill($pill-low-bg, $pill-low-text, $pill-low-shadow);
+}
+.priority-primary {
+  @include pill($pill-medium-bg, $pill-medium-text, $pill-medium-shadow);
+}
+.priority-warning {
+  @include pill($pill-high-bg, $pill-high-text, $pill-high-shadow);
+}
+.priority-danger {
+  @include pill($pill-critical-bg, $pill-critical-text, $pill-critical-shadow);
+}
+
+.actions-header {
+  width: 80px;
+  min-width: 80px;
+  max-width: 80px;
+  text-align: center;
+  padding: 16px 8px;
+  border-bottom: 2px solid #e0e0e0;
+  background: #f5f5f5;
+  font-weight: 600;
+  color: #333;
+}
+
+.actions-cell {
+  width: 80px;
+  min-width: 80px;
+  max-width: 80px;
+  text-align: center;
+  padding: 8px !important;
+  display: table-cell;
+  vertical-align: middle;
+  background: transparent;
+  .mat-mdc-icon-button {
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+    display: inline-block;
+  }
+  .action-button {
+    color: #666;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    &:hover {
+      color: #333;
+      background: transparent !important;
+    }
+    &:focus,
+    &:active {
+      background: transparent !important;
+    }
+  }
+}
+
+.delete-action {
+  color: #dc3545;
+  mat-icon {
+    color: #dc3545;
+  }
+}
+
+::ng-deep {
+  .actions-cell .mat-mdc-icon-button {
+    background: transparent !important;
+    &:hover,
+    &:focus,
+    &:active {
+      background: transparent !important;
+    }
+  }
+  mat-chip,
+  .mat-mdc-chip,
+  .status-warning mat-chip,
+  .status-info mat-chip,
+  .status-success mat-chip,
+  .status-danger mat-chip,
+  .priority-secondary mat-chip,
+  .priority-primary mat-chip,
+  .priority-warning mat-chip,
+  .priority-danger mat-chip {
+    color: $white !important;
+    .mat-mdc-chip-text,
+    .mat-mdc-chip-text-content {
+      color: $white !important;
+    }
+  }
+}
+
+.empty-state,
+.no-data-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #666;
+  h3 {
+    margin: 0 0 8px 0;
+    color: #333;
+  }
+  p {
+    margin: 0;
+  }
+}
+
+.empty-state {
+  padding: 80px 20px;
+  margin: 0 20px;
+  .empty-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    color: #ccc;
+    margin-bottom: 16px;
+  }
+  h3 {
+    font-size: 24px;
+  }
+  p {
+    font-size: 16px;
+  }
+}
+
+.no-data-row {
+  padding: 60px 20px;
+  .no-data-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: #ccc;
+    margin-bottom: 16px;
+  }
+  h3 {
+    font-size: 18px;
+    font-weight: 500;
+  }
+  p {
+    font-size: 14px;
+    color: #666;
+  }
+}
+
+mat-paginator {
+  background: #fafafa;
+  border-top: 1px solid #e0e0e0;
+  border-radius: 0 0 8px 8px;
+  .mat-mdc-paginator-container {
+    padding: 16px 24px;
+  }
+  .mat-mdc-paginator-page-size-label,
+  .mat-mdc-paginator-range-label {
+    color: #666;
+    font-size: 14px;
+  }
+  .mat-mdc-icon-button {
+    color: #666;
+    &:hover {
+      background: #f0f0f0;
+    }
+  }
+  .mat-mdc-paginator-page-size-select .mat-mdc-select-value {
+    color: #333;
+  }
+}
+
+@media (max-width: 768px) {
+  .filter-section {
+    padding: 15px;
+    flex-direction: column;
+    align-items: stretch;
+    margin: 0 10px 20px 10px;
+    width: calc(100% - 20px);
+  }
+  .search-field {
+    max-width: none;
+  }
+  .table-card {
+    margin: 0 10px 10px 10px;
+    width: calc(100% - 20px);
+  }
+  .loading-container,
+  .empty-state {
+    margin: 0 10px;
+  }
+  mat-paginator .mat-mdc-paginator-container {
+    padding: 12px 16px;
+    flex-direction: column;
+    gap: 8px;
+    .mat-mdc-paginator-page-size {
+      margin-bottom: 8px;
+    }
+  }
+  table .mat-mdc-cell {
+    padding: 12px 8px;
+  }
+  .task-description {
+    max-width: 200px;
+  }
+}
+
+@media (max-width: 600px) {
+  .displayed-columns .mat-column-description {
+    display: none;
+  }
+}
