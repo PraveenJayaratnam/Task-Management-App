@@ -96,17 +96,12 @@ export class TaskListComponent implements OnInit, AfterViewInit, OnDestroy {
   paginationData = input<DataResponse<Task> | null>(null);
   loading = input<boolean>(false);
   currentSort = input<{ sortBy: string; sortDirection: 'asc' | 'desc' } | null>(null);
-  currentSort = input<{ sortBy: string; sortDirection: 'asc' | 'desc' } | null>(null);
 
-  addTask = output<void>();
   addTask = output<void>();
   editTask = output<Task>();
   deleteTask = output<Task>();
   pageChange = output<PageEvent>();
-  pageChange = output<PageEvent>();
   searchChange = output<string>();
-  statusFilterChange = output<number | null>();
-  priorityFilterChange = output<number | null>();
   statusFilterChange = output<number | null>();
   priorityFilterChange = output<number | null>();
   sortChange = output<{
@@ -114,21 +109,11 @@ export class TaskListComponent implements OnInit, AfterViewInit, OnDestroy {
     sortDirection: 'asc' | 'desc';
   }>();
   refreshTasks = output<void>();
-  refreshTasks = output<void>();
 
   filterForm!: FormGroup;
   Math = Math;
   taskStatusOptions = TASK_STATUS_OPTIONS;
   taskPriorityOptions = TASK_PRIORITY_OPTIONS;
-
-  displayedColumns: string[] = [
-    'actions',
-    'title',
-    'description',
-    'status',
-    'priority',
-    'dueDate',
-  ];
 
   displayedColumns: string[] = [
     'actions',
@@ -149,15 +134,7 @@ export class TaskListComponent implements OnInit, AfterViewInit, OnDestroy {
     this.#handleSearchChange();
     this.#handleStatusFilterChange();
     this.#handlePriorityFilterChange();
-    this.#handleStatusFilterChange();
-    this.#handlePriorityFilterChange();
     this.#handleSortChange();
-  }
-
-  ngAfterViewInit() {
-    if (this.currentSort()) {
-      this.setSortState(this.currentSort()!.sortBy, this.currentSort()!.sortDirection);
-    }
   }
 
   ngAfterViewInit() {
@@ -169,8 +146,6 @@ export class TaskListComponent implements OnInit, AfterViewInit, OnDestroy {
   #initializeForm() {
     this.filterForm = this.#fb.group({
       searchTerm: [''],
-      statusFilter: [''],
-      priorityFilter: [''],
       statusFilter: [''],
       priorityFilter: [''],
       sortBy: [''],
