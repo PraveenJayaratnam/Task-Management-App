@@ -4,7 +4,7 @@ import { Task, TaskFilter } from '@features/task-management/models';
 import { TaskService } from '@features/task-management/services';
 import { DataResponse } from '@shared/models';
 import { Subscription } from 'rxjs';
-import { TaskListComponent } from '../';
+import { TaskListComponent } from '../../components';
 
 export enum MessageType {
   Success = 'success',
