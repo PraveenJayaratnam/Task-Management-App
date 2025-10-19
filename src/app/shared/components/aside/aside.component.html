@@ -1,0 +1,111 @@
+<button
+  class="hamburger-btn d-lg-none"
+  (click)="toggleAside()"
+  [class.active]="isOpen()"
+  aria-label="Toggle navigation menu"
+>
+  <span></span>
+  <span></span>
+  <span></span>
+</button>
+
+@if (isOpen()) {
+  <div
+    class="aside-overlay"
+    (click)="closeAside()"
+    (keydown.enter)="closeAside()"
+    (keydown.escape)="closeAside()"
+    tabindex="0"
+    role="button"
+    aria-label="Close navigation menu"
+  ></div>
+}
+
+<aside
+  class="aside-nav"
+  [class.open]="isOpen()"
+>
+  <div class="aside-header">
+    <div class="d-flex align-items-center">
+      <i class="bi bi-check2-square text-primary me-2"></i>
+      <h5 class="mb-0 fw-bold">Task Manager</h5>
+    </div>
+    <button
+      class="btn-close d-lg-none"
+      (click)="closeAside()"
+      aria-label="Close navigation"
+    ></button>
+  </div>
+
+  <div class="aside-body">
+    @if (authService.user) {
+      <div class="user-info mb-4">
+        <div class="d-flex align-items-center">
+          <div class="user-avatar me-3">
+            <i class="bi bi-person-circle"></i>
+          </div>
+          <div class="user-details">
+            <div class="fw-medium">
+              {{ authService.user.firstName || authService.user.username }}
+            </div>
+            <small class="text-muted">@{{ authService.user.username }}</small>
+          </div>
+        </div>
+      </div>
+    }
+
+    <nav class="aside-menu">
+      <div class="menu-section">
+        <h6 class="menu-title">Main</h6>
+        <ul class="menu-list">
+          <li class="menu-item">
+            <a
+              class="menu-link"
+              [class.active]="isActiveRoute('/tasks')"
+              (click)="navigateTo('/tasks')"
+              (keydown.enter)="navigateTo('/tasks')"
+              (keydown.space)="navigateTo('/tasks')"
+              tabindex="0"
+              role="button"
+              aria-label="Navigate to Tasks"
+            >
+              <i class="bi bi-list-task me-2"></i>
+              <span>Tasks</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="menu-section">
+        <h6 class="menu-title">Management</h6>
+        <ul class="menu-list">
+          <li class="menu-item">
+            <a
+              class="menu-link"
+              [class.active]="isActiveRoute('/users')"
+              (click)="navigateTo('/users')"
+              (keydown.enter)="navigateTo('/users')"
+              (keydown.space)="navigateTo('/users')"
+              tabindex="0"
+              role="button"
+              aria-label="Navigate to User Management"
+            >
+              <i class="bi bi-people me-2"></i>
+              <span>User Management</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  </div>
+
+  <div class="aside-footer">
+    <button
+      class="btn btn-outline-danger btn-sm w-100"
+      (click)="onLogout()"
+    >
+      <i class="bi bi-box-arrow-right me-2"></i>
+      Logout
+    </button>
+  </div>
+</aside>

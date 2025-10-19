@@ -45,7 +45,7 @@ export interface Task extends BaseEntity {
   description?: string;
   status: TaskStatus;
   priority?: TaskPriority;
-  dueDate?: string;
+  dueDate?: string | Date;
 }
 
 export interface CreateTask {
@@ -53,7 +53,7 @@ export interface CreateTask {
   description?: string;
   status: TaskStatus;
   priority?: TaskPriority;
-  dueDate?: string;
+  dueDate?: string | Date;
 }
 
 export interface UpdateTask {
@@ -61,5 +61,5 @@ export interface UpdateTask {
   description?: string;
   status?: TaskStatus;
   priority?: TaskPriority;
-  dueDate?: string;
+  dueDate?: string | Date;
 }

@@ -2,6 +2,7 @@ import { DatePipe } from '@angular/common';
 import {
   AfterViewInit,
   Component,
+  OnDestroy,
   OnInit,
   inject,
   input,
@@ -45,6 +46,7 @@ import {
 import { TaskService } from '@features/task-management/services';
 import { ConfirmationDialogComponent } from '@shared/components/confirmation-dialog/confirmation-dialog.component';
 import { DataResponse } from '@shared/models';
+import { Subscription } from 'rxjs';
 import { TaskDialogComponent } from '../task-dialog/task-dialog.component';
 
 @Component({
@@ -87,25 +89,31 @@ import { TaskDialogComponent } from '../task-dialog/task-dialog.component';
   templateUrl: './task-list.component.html',
   styleUrl: './task-list.component.scss',
 })
-export class TaskListComponent implements OnInit, AfterViewInit {
+export class TaskListComponent implements OnInit, AfterViewInit, OnDestroy {
   sort = viewChild(MatSort);
 
   tasks = input<Task[]>([]);
   paginationData = input<DataResponse<Task> | null>(null);
   loading = input<boolean>(false);
   currentSort = input<{ sortBy: string; sortDirection: 'asc' | 'desc' } | null>(null);
+  currentSort = input<{ sortBy: string; sortDirection: 'asc' | 'desc' } | null>(null);
 
+  addTask = output<void>();
   addTask = output<void>();
   editTask = output<Task>();
   deleteTask = output<Task>();
   pageChange = output<PageEvent>();
+  pageChange = output<PageEvent>();
   searchChange = output<string>();
+  statusFilterChange = output<number | null>();
+  priorityFilterChange = output<number | null>();
   statusFilterChange = output<number | null>();
   priorityFilterChange = output<number | null>();
   sortChange = output<{
     sortBy: string;
     sortDirection: 'asc' | 'desc';
   }>();
+  refreshTasks = output<void>();
   refreshTasks = output<void>();
 
   filterForm!: FormGroup;
@@ -122,16 +130,34 @@ export class TaskListComponent implements OnInit, AfterViewInit {
     'dueDate',
   ];
 
+  displayedColumns: string[] = [
+    'actions',
+    'title',
+    'description',
+    'status',
+    'priority',
+    'dueDate',
+  ];
+
   #fb = inject(FormBuilder);
   #dialog = inject(MatDialog);
   #taskService = inject(TaskService);
+  #subscriptions = new Set<Subscription>();
 
   ngOnInit() {
     this.#initializeForm();
     this.#handleSearchChange();
     this.#handleStatusFilterChange();
     this.#handlePriorityFilterChange();
+    this.#handleStatusFilterChange();
+    this.#handlePriorityFilterChange();
     this.#handleSortChange();
+  }
+
+  ngAfterViewInit() {
+    if (this.currentSort()) {
+      this.setSortState(this.currentSort()!.sortBy, this.currentSort()!.sortDirection);
+    }
   }
 
   ngAfterViewInit() {
@@ -145,37 +171,64 @@ export class TaskListComponent implements OnInit, AfterViewInit {
       searchTerm: [''],
       statusFilter: [''],
       priorityFilter: [''],
+      statusFilter: [''],
+      priorityFilter: [''],
       sortBy: [''],
       sortDirection: ['asc'],
     });
   }
 
   #handleSearchChange() {
-    this.filterForm.get('searchTerm')?.valueChanges.subscribe((value) => {
-      this.searchChange.emit(value);
-    });
+    const subscription = this.filterForm
+      .get('searchTerm')
+      ?.valueChanges.subscribe((value) => {
+        this.searchChange.emit(value);
+      });
+    if (subscription) {
+      this.#subscriptions.add(subscription);
+    }
   }
 
   #handleStatusFilterChange() {
-    this.filterForm.get('statusFilter')?.valueChanges.subscribe((value) => {
-      this.statusFilterChange.emit(value || null);
-    });
+    const subscription = this.filterForm
+      .get('statusFilter')
+      ?.valueChanges.subscribe((value) => {
+        this.statusFilterChange.emit(value || null);
+      });
+    if (subscription) {
+      this.#subscriptions.add(subscription);
+    }
   }
 
   #handlePriorityFilterChange() {
-    this.filterForm.get('priorityFilter')?.valueChanges.subscribe((value) => {
-      this.priorityFilterChange.emit(value || null);
-    });
+    const subscription = this.filterForm
+      .get('priorityFilter')
+      ?.valueChanges.subscribe((value) => {
+        this.priorityFilterChange.emit(value || null);
+      });
+    if (subscription) {
+      this.#subscriptions.add(subscription);
+    }
   }
 
   #handleSortChange() {
-    this.filterForm.get('sortBy')?.valueChanges.subscribe(() => {
-      this.#emitSortChange();
-    });
+    const sortBySubscription = this.filterForm
+      .get('sortBy')
+      ?.valueChanges.subscribe(() => {
+        this.#emitSortChange();
+      });
+    if (sortBySubscription) {
+      this.#subscriptions.add(sortBySubscription);
+    }
 
-    this.filterForm.get('sortDirection')?.valueChanges.subscribe(() => {
-      this.#emitSortChange();
-    });
+    const sortDirectionSubscription = this.filterForm
+      .get('sortDirection')
+      ?.valueChanges.subscribe(() => {
+        this.#emitSortChange();
+      });
+    if (sortDirectionSubscription) {
+      this.#subscriptions.add(sortDirectionSubscription);
+    }
   }
 
   onResetFilters() {
@@ -204,9 +257,9 @@ export class TaskListComponent implements OnInit, AfterViewInit {
       },
     });
 
-    dialogRef.afterClosed().subscribe((result) => {
+    const dialogSubscription = dialogRef.afterClosed().subscribe((result) => {
       if (result && result.action === 'create') {
-        this.#taskService.create(result.task).subscribe({
+        const createSubscription = this.#taskService.create(result.task).subscribe({
           next: () => {
             this.addTask.emit();
           },
@@ -214,8 +267,10 @@ export class TaskListComponent implements OnInit, AfterViewInit {
             console.error('Error creating task:', error);
           },
         });
+        this.#subscriptions.add(createSubscription);
       }
     });
+    this.#subscriptions.add(dialogSubscription);
   }
 
   onEdit(task: Task) {
@@ -231,18 +286,22 @@ export class TaskListComponent implements OnInit, AfterViewInit {
       },
     });
 
-    dialogRef.afterClosed().subscribe((result) => {
+    const dialogSubscription = dialogRef.afterClosed().subscribe((result) => {
       if (result && result.action === 'update') {
-        this.#taskService.update(result.id, result.task).subscribe({
-          next: () => {
-            this.editTask.emit({ id: result.id, ...result.task });
-          },
-          error: (error) => {
-            console.error('Error updating task:', error);
-          },
-        });
+        const updateSubscription = this.#taskService
+          .update(result.id, result.task)
+          .subscribe({
+            next: () => {
+              this.editTask.emit({ id: result.id, ...result.task });
+            },
+            error: (error) => {
+              console.error('Error updating task:', error);
+            },
+          });
+        this.#subscriptions.add(updateSubscription);
       }
     });
+    this.#subscriptions.add(dialogSubscription);
   }
 
   onDelete(task: Task) {
@@ -254,11 +313,12 @@ export class TaskListComponent implements OnInit, AfterViewInit {
       },
     });
 
-    dialogRef.afterClosed().subscribe((result) => {
+    const dialogSubscription = dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.deleteTask.emit(task);
       }
     });
+    this.#subscriptions.add(dialogSubscription);
   }
 
   onPageChange(event: PageEvent) {
@@ -348,5 +408,10 @@ export class TaskListComponent implements OnInit, AfterViewInit {
         disableClear: false,
       });
     }
+  }
+
+  ngOnDestroy() {
+    this.#subscriptions.forEach((subscription) => subscription.unsubscribe());
+    this.#subscriptions.clear();
   }
 }

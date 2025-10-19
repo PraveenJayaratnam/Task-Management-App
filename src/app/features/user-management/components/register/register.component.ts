@@ -74,7 +74,10 @@ export class RegisterComponent implements OnInit, OnDestroy {
     }
 
     this.loading.set(true);
-    const registerRequest: RegisterRequest = this.registerForm.value;
+    const registerRequest: RegisterRequest = {
+      ...this.registerForm.value,
+      isActive: true,
+    };
 
     const subscription = this.#authService.register(registerRequest).subscribe({
       next: () => {

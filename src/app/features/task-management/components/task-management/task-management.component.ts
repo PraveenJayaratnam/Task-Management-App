@@ -1,10 +1,7 @@
 import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
-import { AuthService } from '@core/services';
 import { Task, TaskFilter } from '@features/task-management/models';
 import { TaskService } from '@features/task-management/services';
-import { ConfirmationDialogComponent } from '@shared/components/confirmation-dialog/confirmation-dialog.component';
 import { DataResponse } from '@shared/models';
 import { Subscription } from 'rxjs';
 import { TaskListComponent } from '../';
@@ -29,9 +26,7 @@ export class TaskManagementComponent implements OnInit, OnDestroy {
   message = signal<string>('');
   messageType = signal<MessageType>(MessageType.Info);
 
-  authService = inject(AuthService);
   #taskService = inject(TaskService);
-  #dialog = inject(MatDialog);
   #subscriptions = new Set<Subscription>();
 
   #appliedFilter: TaskFilter = {
@@ -57,11 +52,9 @@ export class TaskManagementComponent implements OnInit, OnDestroy {
         this.loading.set(false);
       },
       error: () => {
-        // Fallback to queryable if paginated endpoint fails
         this.#taskService.getFilteredQueryable(this.#appliedFilter).subscribe({
           next: (response: Task[]) => {
             this.tasks.set(response);
-            // Create mock pagination data
             this.paginationData.set({
               items: response,
               pageSize: this.#appliedFilter.pageSize || 10,
@@ -164,23 +157,6 @@ export class TaskManagementComponent implements OnInit, OnDestroy {
 
   clearMessage() {
     this.message.set('');
-  }
-
-  onLogout() {
-    const dialogRef = this.#dialog.open(ConfirmationDialogComponent, {
-      width: '400px',
-      data: {
-        title: 'Logout',
-        message:
-          'Are you sure you want to logout? You will need to sign in again to access your tasks.',
-      },
-    });
-
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.authService.logout();
-      }
-    });
   }
 
   ngOnDestroy() {

@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
 import {
@@ -24,7 +24,7 @@ import {
 import { MatInput } from '@angular/material/input';
 import { MatOption, MatSelect } from '@angular/material/select';
 import { ConfirmationDialogComponent } from '@shared/components';
-
+import { Subscription } from 'rxjs';
 import {
   CreateTask,
   Task,
@@ -64,10 +64,11 @@ export interface TaskDialogData {
   templateUrl: './task-dialog.component.html',
   styleUrl: './task-dialog.component.scss',
 })
-export class TaskDialogComponent implements OnInit {
+export class TaskDialogComponent implements OnInit, OnDestroy {
   #fb = inject(FormBuilder);
   #dialogRef = inject(MatDialogRef<TaskDialogComponent>);
   #dialog = inject(MatDialog);
+  #subscriptions = new Set<Subscription>();
   data: TaskDialogData = inject(MAT_DIALOG_DATA);
 
   taskForm!: FormGroup;
@@ -94,7 +95,11 @@ export class TaskDialogComponent implements OnInit {
         description: this.data.task.description,
         status: this.data.task.status,
         priority: this.data.task.priority,
-        dueDate: this.data.task.dueDate ? new Date(this.data.task.dueDate) : '',
+        dueDate: this.data.task.dueDate
+          ? typeof this.data.task.dueDate === 'string'
+            ? new Date(this.data.task.dueDate)
+            : this.data.task.dueDate
+          : null,
       });
     }
   }
@@ -117,7 +122,11 @@ export class TaskDialogComponent implements OnInit {
         description: formValue.description,
         status: formValue.status,
         priority: formValue.priority,
-        dueDate: formValue.dueDate ? formValue.dueDate.toISOString() : null,
+        dueDate: formValue.dueDate
+          ? formValue.dueDate instanceof Date
+            ? formValue.dueDate.toISOString()
+            : formValue.dueDate
+          : undefined,
       };
       this.#dialogRef.close({
         action: 'update',
@@ -130,7 +139,11 @@ export class TaskDialogComponent implements OnInit {
         description: formValue.description,
         status: formValue.status,
         priority: formValue.priority,
-        dueDate: formValue.dueDate ? formValue.dueDate.toISOString() : null,
+        dueDate: formValue.dueDate
+          ? formValue.dueDate instanceof Date
+            ? formValue.dueDate.toISOString()
+            : formValue.dueDate
+          : undefined,
       };
       this.#dialogRef.close({ action: 'create', task: createTask });
     }
@@ -151,13 +164,19 @@ export class TaskDialogComponent implements OnInit {
         width: '400px',
       });
 
-      dialogRef.afterClosed().subscribe((result) => {
+      const subscription = dialogRef.afterClosed().subscribe((result) => {
         if (result) {
           this.#dialogRef.close({ action: 'cancel' });
         }
       });
+      this.#subscriptions.add(subscription);
     } else {
       this.#dialogRef.close({ action: 'cancel' });
     }
+  }
+
+  ngOnDestroy() {
+    this.#subscriptions.forEach((subscription) => subscription.unsubscribe());
+    this.#subscriptions.clear();
   }
 }
