@@ -27,6 +27,7 @@ export class TaskManagementComponent implements OnInit, OnDestroy {
   messageType = signal<MessageType>(MessageType.Info);
 
   #taskService = inject(TaskService);
+  #dialog = inject(MatDialog);
   #subscriptions = new Set<Subscription>();
 
   #appliedFilter: TaskFilter = {

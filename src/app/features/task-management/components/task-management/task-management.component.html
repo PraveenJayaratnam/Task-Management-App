@@ -1,47 +1,49 @@
 <div class="container-fluid py-4">
   <div class="row mb-2">
-    <div class="col-12">
-      <div class="d-flex justify-content-between align-items-center">
-        <div>
-          <h1 class="display-4 mb-2">Task Management</h1>
-          <p class="text-muted mb-0">Manage your tasks efficiently</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  @if (message()) {
-    <div class="row mb-3">
+    <div class="row mb-2">
       <div class="col-12">
-        <div
-          class="alert alert-dismissible fade show"
-          [class]="'alert-' + messageType()"
-        >
-          {{ message() }}
-          <button
-            type="button"
-            class="btn-close"
-            (click)="clearMessage()"
-            aria-label="Close"
-          ></button>
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h1 class="display-4 mb-2">Task Management</h1>
+            <p class="text-muted mb-0">Manage your tasks efficiently</p>
+          </div>
         </div>
       </div>
     </div>
-  }
 
-  <app-task-list
-    [tasks]="tasks()"
-    [paginationData]="paginationData()"
-    [loading]="loading()"
-    [currentSort]="getCurrentSort()"
-    (addTask)="onAddTask()"
-    (editTask)="onEditTask()"
-    (deleteTask)="onDeleteTask($event)"
-    (pageChange)="onPageChange($event)"
-    (searchChange)="onSearchChange($event)"
-    (statusFilterChange)="onStatusFilterChange($event)"
-    (priorityFilterChange)="onPriorityFilterChange($event)"
-    (sortChange)="onSortChange($event)"
-    (refreshTasks)="loadTasks()"
-  ></app-task-list>
+    @if (message()) {
+      <div class="row mb-3">
+        <div class="col-12">
+          <div
+            class="alert alert-dismissible fade show"
+            [class]="'alert-' + messageType()"
+          >
+            {{ message() }}
+            <button
+              type="button"
+              class="btn-close"
+              (click)="clearMessage()"
+              aria-label="Close"
+            ></button>
+          </div>
+        </div>
+      </div>
+    }
+
+    <app-task-list
+      [tasks]="tasks()"
+      [paginationData]="paginationData()"
+      [loading]="loading()"
+      [currentSort]="getCurrentSort()"
+      (addTask)="onAddTask()"
+      (editTask)="onEditTask()"
+      (deleteTask)="onDeleteTask($event)"
+      (pageChange)="onPageChange($event)"
+      (searchChange)="onSearchChange($event)"
+      (statusFilterChange)="onStatusFilterChange($event)"
+      (priorityFilterChange)="onPriorityFilterChange($event)"
+      (sortChange)="onSortChange($event)"
+      (refreshTasks)="loadTasks()"
+    ></app-task-list>
+  </div>
 </div>
