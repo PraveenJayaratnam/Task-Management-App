@@ -1,0 +1,89 @@
+<div class="user-edit-dialog">
+  <h2 mat-dialog-title>Edit User</h2>
+
+  <mat-dialog-content>
+    <form
+      [formGroup]="userForm"
+      class="user-form mt-2"
+    >
+      <mat-form-field
+        appearance="outline"
+        class="full-width"
+      >
+        <mat-label>Username</mat-label>
+        <input
+          matInput
+          formControlName="username"
+          placeholder="Enter username"
+        />
+        @if (userForm.get('username')?.hasError('required')) {
+          <mat-error>Username is required</mat-error>
+        }
+        @if (userForm.get('username')?.hasError('minlength')) {
+          <mat-error>Username must be at least 3 characters long</mat-error>
+        }
+        @if (userForm.get('username')?.hasError('pattern')) {
+          <mat-error
+            >Username can only contain letters, numbers, and underscores</mat-error
+          >
+        }
+      </mat-form-field>
+
+      <mat-form-field
+        appearance="outline"
+        class="full-width"
+      >
+        <mat-label>First Name</mat-label>
+        <input
+          matInput
+          formControlName="firstName"
+          placeholder="Enter first name"
+        />
+        @if (userForm.get('firstName')?.hasError('required')) {
+          <mat-error>First name is required</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field
+        appearance="outline"
+        class="full-width"
+      >
+        <mat-label>Last Name</mat-label>
+        <input
+          matInput
+          formControlName="lastName"
+          placeholder="Enter last name"
+        />
+        @if (userForm.get('lastName')?.hasError('required')) {
+          <mat-error>Last name is required</mat-error>
+        }
+      </mat-form-field>
+
+      <div class="status-field">
+        <mat-checkbox
+          formControlName="isActive"
+          class="status-checkbox"
+        >
+          Active User
+        </mat-checkbox>
+      </div>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button
+      mat-button
+      (click)="onCancel()"
+    >
+      Cancel
+    </button>
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="onSave()"
+      [disabled]="userForm.invalid"
+    >
+      Save Changes
+    </button>
+  </mat-dialog-actions>
+</div>

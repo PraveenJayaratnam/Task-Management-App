@@ -4,6 +4,7 @@ export interface User extends BaseEntity {
   username: string;
   firstName?: string;
   lastName?: string;
+  isActive?: boolean;
 }
 
 export interface LoginRequest {
@@ -22,11 +23,14 @@ export interface RegisterRequest {
   password: string;
   firstName?: string;
   lastName?: string;
+  isActive?: boolean;
 }
 
 export interface UpdateUserDto {
+  username?: string;
   firstName?: string;
   lastName?: string;
+  isActive?: boolean;
 }
 
 export interface AuthState {

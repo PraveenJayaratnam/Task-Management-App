@@ -114,7 +114,7 @@
     >
       {{ data.isEdit ? 'Update' : 'Create' }}
     </button>
-    @if (taskForm.invalid && taskForm.touched) {
+    @if (saveAttempted && taskForm.invalid && taskForm.touched) {
       <mat-hint class="form-validation-hint">
         Complete all required fields to continue
       </mat-hint>
