@@ -1,22 +1,18 @@
 import { Routes } from '@angular/router';
 import { MainLayoutComponent } from '@core/components';
 import { authGuard } from '@core/guards';
-import { TaskManagementComponent } from '@features/task-management/components';
-import {
-  LoginComponent,
-  RegisterComponent,
-  UserManagementComponent,
-} from '@features/user-management/components';
 
 export const routes: Routes = [
   {
     path: 'login',
-    component: LoginComponent,
+    loadComponent: () =>
+      import('@features/user-management/components').then((m) => m.LoginComponent),
     title: 'Login - Task Management',
   },
   {
     path: 'register',
-    component: RegisterComponent,
+    loadComponent: () =>
+      import('@features/user-management/components').then((m) => m.RegisterComponent),
     title: 'Register - Task Management',
   },
   {
@@ -26,12 +22,18 @@ export const routes: Routes = [
     children: [
       {
         path: 'tasks',
-        component: TaskManagementComponent,
+        loadComponent: () =>
+          import('@features/task-management/components').then(
+            (m) => m.TaskManagementComponent
+          ),
         title: 'Tasks - Task Management',
       },
       {
         path: 'users',
-        component: UserManagementComponent,
+        loadComponent: () =>
+          import('@features/user-management/components').then(
+            (m) => m.UserManagementComponent
+          ),
         title: 'User Management - Task Management',
       },
       {
