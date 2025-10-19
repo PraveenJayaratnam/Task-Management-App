@@ -9,6 +9,7 @@ import {
 } from '@angular/material/datepicker';
 import {
   MAT_DIALOG_DATA,
+  MatDialog,
   MatDialogActions,
   MatDialogContent,
   MatDialogRef,
@@ -23,6 +24,7 @@ import {
 } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { MatOption, MatSelect } from '@angular/material/select';
+import { ConfirmationDialogComponent } from '@shared/components';
 
 import {
   CreateTask,
@@ -67,11 +69,13 @@ export interface TaskDialogData {
 export class TaskDialogComponent implements OnInit {
   #fb = inject(FormBuilder);
   #dialogRef = inject(MatDialogRef<TaskDialogComponent>);
+  #dialog = inject(MatDialog);
   data: TaskDialogData = inject(MAT_DIALOG_DATA);
 
   taskForm!: FormGroup;
   statusOptions = TASK_STATUS_OPTIONS;
   priorityOptions = TASK_PRIORITY_OPTIONS;
+  saveAttempted = false;
 
   ngOnInit() {
     this.#initializeForm();
@@ -98,6 +102,7 @@ export class TaskDialogComponent implements OnInit {
   }
 
   onSave() {
+    this.saveAttempted = true;
     this.taskForm.markAllAsTouched();
 
     if (!this.taskForm.valid) {
@@ -133,7 +138,28 @@ export class TaskDialogComponent implements OnInit {
     }
   }
 
+  #hasUnsavedChanges(): boolean {
+    return this.taskForm.dirty;
+  }
+
   onCancel() {
-    this.#dialogRef.close({ action: 'cancel' });
+    if (this.#hasUnsavedChanges()) {
+      const dialogRef = this.#dialog.open(ConfirmationDialogComponent, {
+        data: {
+          title: 'Unsaved Changes',
+          message: 'You have unsaved changes. Are you sure you want to cancel?',
+          confirmText: 'Yes, Cancel',
+        },
+        width: '400px',
+      });
+
+      dialogRef.afterClosed().subscribe((result) => {
+        if (result) {
+          this.#dialogRef.close({ action: 'cancel' });
+        }
+      });
+    } else {
+      this.#dialogRef.close({ action: 'cancel' });
+    }
   }
 }
