@@ -18,22 +18,12 @@ export class TaskService extends BaseApiService {
     return this.getEntity<Task[]>(`${this.#baseUrl}/queryable`);
   }
 
-  getAllQueryable(filter?: TaskFilter): Observable<Task[]> {
-    const queryString = QueryHelper.buildQuery(filter);
-    const url = queryString ? `${this.#baseUrl}/queryable?${queryString}` : `${this.#baseUrl}/queryable`;
-    return this.getEntity<Task[]>(url);
-  }
-
   getList(filter?: TaskFilter): Observable<DataResponse<Task>> {
     const queryString = QueryHelper.buildQuery(filter);
-    const url = queryString ? `${this.#baseUrl}/paginated?${queryString}` : `${this.#baseUrl}/paginated`;
+    const url = queryString
+      ? `${this.#baseUrl}/paginated?${queryString}`
+      : `${this.#baseUrl}/paginated`;
     return this.getEntity<DataResponse<Task>>(url);
-  }
-
-  getFilteredQueryable(filter?: TaskFilter): Observable<Task[]> {
-    const queryString = QueryHelper.buildQuery(filter);
-    const url = queryString ? `${this.#baseUrl}/queryable?${queryString}` : `${this.#baseUrl}/queryable`;
-    return this.getEntity<Task[]>(url);
   }
 
   getById(id: string): Observable<Task> {
@@ -49,10 +39,6 @@ export class TaskService extends BaseApiService {
   }
 
   delete(id: string): Observable<void> {
-    return this.deleteEntity<void>(`${this.#baseUrl}/${id}`);
-  }
-
-  remove(id: string): Observable<void> {
     return this.deleteEntity<void>(`${this.#baseUrl}/${id}`);
   }
 

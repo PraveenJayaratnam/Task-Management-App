@@ -52,7 +52,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
   #usernameAsyncValidator(): AsyncValidatorFn {
     return (control: AbstractControl): Observable<ValidationErrors | null> => {
-      if (!control.value || control.value.length < 3) {
+      if (!control.value) {
         return of(null);
       }
 

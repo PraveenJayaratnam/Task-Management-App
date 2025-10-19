@@ -2,15 +2,10 @@ import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 import { Task, TaskFilter } from '@features/task-management/models';
 import { TaskService } from '@features/task-management/services';
+import { MessageType } from '@shared/enums';
 import { DataResponse } from '@shared/models';
 import { Subscription } from 'rxjs';
 import { TaskListComponent } from '../../components';
-
-export enum MessageType {
-  Success = 'success',
-  Error = 'error',
-  Info = 'info',
-}
 
 @Component({
   selector: 'app-task-management',
@@ -52,29 +47,8 @@ export class TaskManagementComponent implements OnInit, OnDestroy {
         this.loading.set(false);
       },
       error: () => {
-        this.#taskService.getFilteredQueryable(this.#appliedFilter).subscribe({
-          next: (response: Task[]) => {
-            this.tasks.set(response);
-            this.paginationData.set({
-              items: response,
-              pageSize: this.#appliedFilter.pageSize || 10,
-              pageIndex: this.#appliedFilter.pageIndex || 0,
-              totalCount: response.length,
-              totalPages: Math.ceil(
-                response.length / (this.#appliedFilter.pageSize || 10)
-              ),
-              hasPreviousPage: (this.#appliedFilter.pageIndex || 0) > 0,
-              hasNextPage:
-                (this.#appliedFilter.pageIndex || 0) <
-                Math.ceil(response.length / (this.#appliedFilter.pageSize || 10)) - 1,
-            });
-            this.loading.set(false);
-          },
-          error: () => {
-            this.showMessage('Failed to load tasks', MessageType.Error);
-            this.loading.set(false);
-          },
-        });
+        this.showMessage('Failed to load tasks', MessageType.Error);
+        this.loading.set(false);
       },
     });
     this.#subscriptions.add(subscription);
@@ -93,7 +67,7 @@ export class TaskManagementComponent implements OnInit, OnDestroy {
   onDeleteTask(task: Task) {
     if (!task.id) return;
 
-    const subscription = this.#taskService.remove(task.id).subscribe({
+    const subscription = this.#taskService.delete(task.id).subscribe({
       next: () => {
         this.showMessage('Task deleted successfully', MessageType.Success);
         this.loadTasks();

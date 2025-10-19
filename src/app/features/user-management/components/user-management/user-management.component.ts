@@ -4,6 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { User } from '@core/models';
 import { AuthService, UserService } from '@core/services';
 import { ConfirmationDialogComponent } from '@shared/components/confirmation-dialog/confirmation-dialog.component';
+import { MessageType } from '@shared/enums';
 import { Subscription } from 'rxjs';
 import { UserEditDialogComponent } from '../user-edit-dialog/user-edit-dialog.component';
 
@@ -18,7 +19,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   users = signal<User[]>([]);
   loading = signal<boolean>(false);
   message = signal<string>('');
-  messageType = signal<'success' | 'error' | 'info'>('info');
+  messageType = signal<MessageType>(MessageType.Info);
 
   authService = inject(AuthService);
   userService = inject(UserService);
@@ -40,7 +41,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
       error: (error) => {
         console.error('Error loading users:', error);
         const errorMessage = this.getErrorMessage(error);
-        this.showMessage(errorMessage || 'Failed to load users', 'error');
+        this.showMessage(errorMessage || 'Failed to load users', MessageType.Error);
         this.loading.set(false);
       },
     });
@@ -61,12 +62,12 @@ export class UserManagementComponent implements OnInit, OnDestroy {
         const subscription = this.userService.deleteUser(user.id!).subscribe({
           next: () => {
             this.users.update((users) => users.filter((u) => u.id !== user.id));
-            this.showMessage('User deleted successfully', 'success');
+            this.showMessage('User deleted successfully', MessageType.Success);
           },
           error: (error) => {
             console.error('Error deleting user:', error);
             const errorMessage = this.getErrorMessage(error);
-            this.showMessage(errorMessage || 'Failed to delete user', 'error');
+            this.showMessage(errorMessage || 'Failed to delete user', MessageType.Error);
           },
         });
         this.#subscriptions.add(subscription);
@@ -91,7 +92,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
           next: () => {
             this.showMessage(
               `User ${user.firstName} ${user.lastName} updated successfully`,
-              'success'
+              MessageType.Success
             );
 
             const currentUser = this.authService.user;
@@ -104,7 +105,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
                     if (!mappedUser.isActive) {
                       this.showMessage(
                         'Your account has been deactivated. You will be logged out.',
-                        'info'
+                        MessageType.Info
                       );
                       this.authService.logout();
                     } else {
@@ -124,7 +125,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
           error: (error) => {
             console.error('Error updating user:', error);
             const errorMessage = this.getErrorMessage(error);
-            this.showMessage(errorMessage || 'Failed to update user', 'error');
+            this.showMessage(errorMessage || 'Failed to update user', MessageType.Error);
           },
         });
         this.#subscriptions.add(subscription);
@@ -133,7 +134,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     this.#subscriptions.add(dialogSubscription);
   }
 
-  showMessage(text: string, type: 'success' | 'error' | 'info') {
+  showMessage(text: string, type: MessageType) {
     this.message.set(text);
     this.messageType.set(type);
 
