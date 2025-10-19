@@ -2,6 +2,7 @@ import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/
 import { provideRouter } from '@angular/router';
 
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
+import { provideMomentDateAdapter } from '@angular/material-moment-adapter';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { authInterceptor } from '@core/interceptors';
 import { routes } from './app.routes';
@@ -12,5 +13,6 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideClientHydration(withEventReplay()),
     provideHttpClient(withFetch(), withInterceptors([authInterceptor])),
+    provideMomentDateAdapter(),
   ],
 };

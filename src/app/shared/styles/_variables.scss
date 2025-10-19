@@ -1,0 +1,106 @@
+// Core Colors
+$primary-color: #007bff;
+$primary-dark: #0056b3;
+$primary-darker: #004085;
+$secondary-color: #6c757d;
+$secondary-light: #e9ecef;
+$danger-color: #dc3545;
+$info-color: #17a2b8;
+$white: #ffffff;
+
+// Text Colors
+$text-primary: #212529;
+$text-secondary: #495057;
+$text-muted: #6c757d;
+
+// Border Colors
+$border-color: #dee2e6;
+$border-light: #e0e0e0;
+$border-lighter: #e9ecef;
+$border-dark: #adb5bd;
+
+// Background Colors
+$background-secondary: #f8f9fa;
+$background-light: #fafafa;
+
+// Shadow Colors
+$shadow-light: rgba(0, 0, 0, 0.1);
+$shadow-medium: rgba(0, 0, 0, 0.15);
+$shadow-primary: rgba(0, 123, 255, 0.1);
+$shadow-primary-hover: rgba(0, 123, 255, 0.4);
+
+// Border Radius
+$border-radius-small: 8px;
+$border-radius-medium: 12px;
+$border-radius-large: 16px;
+
+// Spacing
+$spacing-xs: 0.25rem;
+$spacing-sm: 0.5rem;
+$spacing-md: 1rem;
+$spacing-lg: 1.5rem;
+$spacing-xl: 2rem;
+$spacing-xxl: 2.5rem;
+
+// Font Sizes
+$font-size-sm: 0.875rem;
+$font-size-base: 1rem;
+$font-size-lg: 1.125rem;
+$font-size-xl: 1.25rem;
+$font-size-xxl: 1.5rem;
+$font-size-xxxl: 2rem;
+
+// Font Weights
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+// Transitions
+$transition-fast: 0.2s ease;
+$transition-normal: 0.3s ease;
+
+// Breakpoints
+$breakpoint-xs: 320px;
+$breakpoint-sm: 576px;
+$breakpoint-md: 768px;
+
+// Responsive Padding
+$mobile-padding: 1rem;
+$tablet-padding: 1.5rem;
+$desktop-padding: 2rem;
+
+// Responsive Font Sizes
+$mobile-font-size: 0.875rem;
+
+// Pill Colors
+$pill-pending-bg: #e65100;
+$pill-pending-text: $white;
+$pill-pending-shadow: rgba(230, 81, 0, 0.3);
+
+$pill-inprogress-bg: #00bcd4;
+$pill-inprogress-text: $white;
+$pill-inprogress-shadow: rgba(0, 188, 212, 0.3);
+
+$pill-completed-bg: #4caf50;
+$pill-completed-text: $white;
+$pill-completed-shadow: rgba(76, 175, 80, 0.3);
+
+$pill-cancelled-bg: #9c27b0;
+$pill-cancelled-text: $white;
+$pill-cancelled-shadow: rgba(156, 39, 176, 0.3);
+
+$pill-low-bg: #9e9e9e;
+$pill-low-text: $white;
+$pill-low-shadow: rgba(158, 158, 158, 0.3);
+
+$pill-medium-bg: #ba68c8;
+$pill-medium-text: $white;
+$pill-medium-shadow: rgba(186, 104, 200, 0.3);
+
+$pill-high-bg: #ff9800;
+$pill-high-text: $white;
+$pill-high-shadow: rgba(255, 152, 0, 0.3);
+
+$pill-critical-bg: #d32f2f;
+$pill-critical-text: $white;
+$pill-critical-shadow: rgba(211, 47, 47, 0.3);

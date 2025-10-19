@@ -1,156 +1,284 @@
-<div class="card">
-  <div class="card-header">
-    <div class="d-flex justify-content-between align-items-center flex-wrap">
-      <h5 class="card-title mb-0">Task List</h5>
-      <div
-        class="d-flex gap-2 flex-wrap"
-        [formGroup]="filterForm"
-      >
-        <div
-          class="input-group"
-          style="width: 250px"
+<div class="task-list-container">
+  <div class="add-task-header">
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="onAdd()"
+      class="add-task-button"
+    >
+      <mat-icon>add</mat-icon>
+      Add Task
+    </button>
+  </div>
+
+  <div
+    class="filter-section"
+    [formGroup]="filterForm"
+  >
+    <mat-form-field
+      appearance="outline"
+      class="search-field"
+      floatLabel="always"
+    >
+      <mat-label>Search tasks</mat-label>
+      <input
+        matInput
+        formControlName="searchTerm"
+        placeholder="Enter search term..."
+        autocomplete="off"
+      />
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+
+    <mat-form-field
+      appearance="outline"
+      class="filter-field"
+    >
+      <mat-label>Filter by Status</mat-label>
+      <mat-select formControlName="statusFilter">
+        <mat-option value="">All Statuses</mat-option>
+        @for (option of taskStatusOptions; track option.value) {
+          <mat-option [value]="option.value">{{ option.label }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field
+      appearance="outline"
+      class="filter-field"
+    >
+      <mat-label>Filter by Priority</mat-label>
+      <mat-select formControlName="priorityFilter">
+        <mat-option value="">All Priorities</mat-option>
+        @for (option of taskPriorityOptions; track option.value) {
+          <mat-option [value]="option.value">{{ option.label }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <div class="filter-buttons-wrapper mb-4">
+      <div class="button-group">
+        <button
+          mat-stroked-button
+          color="warn"
+          (click)="onResetFilters()"
+          class="reset-filters-button small-button"
         >
-          <span class="input-group-text">
-            <i class="bi bi-search"></i>
-          </span>
-          <input
-            type="text"
-            placeholder="Search tasks..."
-            formControlName="searchTerm"
-            class="form-control"
-          />
-        </div>
-        <select
-          formControlName="sortBy"
-          class="form-select"
-          style="width: 150px"
+          <mat-icon>clear</mat-icon>
+          Reset Filters
+        </button>
+
+        <button
+          mat-stroked-button
+          color="primary"
+          (click)="onRefreshTasks()"
+          class="refresh-tasks-button small-button"
         >
-          <option value="">Sort by...</option>
-          <option value="title">Title</option>
-          <option value="status">Status</option>
-          <option value="priority">Priority</option>
-          <option value="dueDate">Due Date</option>
-        </select>
-        <select
-          formControlName="sortDirection"
-          class="form-select"
-          style="width: 130px"
-        >
-          <option value="asc">Ascending</option>
-          <option value="desc">Descending</option>
-        </select>
+          <mat-icon>refresh</mat-icon>
+          Refresh
+        </button>
       </div>
     </div>
   </div>
 
-  <div class="card-body p-0">
-    <div class="table-responsive">
-      <table class="table table-hover mb-0">
-        <thead class="table-light">
-          <tr>
-            <th>Title</th>
-            <th>Description</th>
-            <th>Status</th>
-            <th>Priority</th>
-            <th>Due Date</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          @if (tasks().length === 0) {
-            <tr>
-              <td
-                colspan="6"
-                class="text-center text-muted py-4"
-              >
-                <i class="bi bi-inbox display-6 d-block mb-2"></i>
-                No tasks found
-              </td>
-            </tr>
-          } @else {
-            @for (task of tasks(); track task.id) {
-              <tr>
-                <td class="fw-medium">{{ task.title }}</td>
-                <td class="text-muted">{{ task.description || 'No description' }}</td>
-                <td>
-                  <span
-                    class="badge"
-                    [class]="'bg-' + getStatusClass(task.status)"
-                  >
-                    {{ getStatusLabel(task.status) }}
-                  </span>
-                </td>
-                <td>
-                  <span
-                    class="badge"
-                    [class]="'bg-' + getPriorityClass(task.priority)"
-                  >
-                    {{ getPriorityLabel(task.priority) }}
-                  </span>
-                </td>
-                <td>
-                  <small class="text-muted">
-                    {{ task.dueDate ? (task.dueDate | date: 'short') : 'No due date' }}
-                  </small>
-                </td>
-                <td>
-                  <div class="btn-group btn-group-sm">
-                    <button
-                      (click)="onEdit(task)"
-                      class="btn btn-outline-primary"
-                    >
-                      <i class="bi bi-pencil"></i> Edit
-                    </button>
-                    <button
-                      (click)="onDelete(task)"
-                      class="btn btn-outline-danger"
-                    >
-                      <i class="bi bi-trash"></i> Delete
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            }
-          }
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  @if (paginationData()) {
-    <div class="card-footer">
-      <div class="d-flex justify-content-between align-items-center flex-wrap">
-        <small class="text-muted">
-          Showing {{ paginationData()!.pageIndex * paginationData()!.pageSize + 1 }} to
-          {{
-            Math.min(
-              (paginationData()!.pageIndex + 1) * paginationData()!.pageSize,
-              paginationData()!.totalCount
-            )
-          }}
-          of {{ paginationData()!.totalCount }} tasks
-        </small>
-        <div class="d-flex align-items-center gap-2">
-          <button
-            (click)="onPageChange(paginationData()!.pageIndex - 1)"
-            [disabled]="!paginationData()!.hasPreviousPage"
-            class="btn btn-outline-secondary btn-sm"
-          >
-            <i class="bi bi-chevron-left"></i> Previous
-          </button>
-          <span class="badge bg-secondary">
-            Page {{ paginationData()!.pageIndex + 1 }} of
-            {{ paginationData()!.totalPages }}
-          </span>
-          <button
-            (click)="onPageChange(paginationData()!.pageIndex + 1)"
-            [disabled]="!paginationData()!.hasNextPage"
-            class="btn btn-outline-secondary btn-sm"
-          >
-            Next <i class="bi bi-chevron-right"></i>
-          </button>
-        </div>
-      </div>
+  @if (loading()) {
+    <div class="loading-container">
+      <mat-spinner diameter="50"></mat-spinner>
+      <p>Loading tasks...</p>
     </div>
   }
+
+  <mat-card class="table-card fade-in">
+    <mat-card-content>
+      @if (loading()) {
+        <div class="loading-container">
+          <mat-spinner diameter="50"></mat-spinner>
+          <p>Loading tasks...</p>
+        </div>
+      } @else {
+        <table
+          mat-table
+          [dataSource]="tasks()"
+          matSort
+          (matSortChange)="onSortChange($event)"
+          class="task-table"
+        >
+          <ng-container matColumnDef="actions">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              class="actions-header"
+            ></th>
+            <td
+              mat-cell
+              *matCellDef="let task"
+              class="actions-cell"
+            >
+              <button
+                mat-icon-button
+                [matMenuTriggerFor]="actionMenu"
+                (click)="$event.stopPropagation()"
+                class="action-button"
+              >
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              <mat-menu #actionMenu="matMenu">
+                <button
+                  mat-menu-item
+                  (click)="onEdit(task)"
+                >
+                  <mat-icon>edit</mat-icon>
+                  <span>Edit</span>
+                </button>
+                <button
+                  mat-menu-item
+                  (click)="onDelete(task)"
+                  class="delete-action"
+                >
+                  <mat-icon>delete</mat-icon>
+                  <span>Delete</span>
+                </button>
+              </mat-menu>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="title">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              mat-sort-header
+            >
+              Title
+            </th>
+            <td
+              mat-cell
+              *matCellDef="let task"
+            >
+              <div class="task-title">{{ task.title }}</div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="description">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+            >
+              Description
+            </th>
+            <td
+              mat-cell
+              *matCellDef="let task"
+            >
+              <div
+                class="task-description"
+                [title]="task.description"
+              >
+                {{ task.description || 'No description' }}
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              mat-sort-header
+            >
+              Status
+            </th>
+            <td
+              mat-cell
+              *matCellDef="let task"
+            >
+              <mat-chip-set>
+                <mat-chip [class]="'status-' + getStatusClass(task.status)">
+                  {{ getStatusLabel(task.status) }}
+                </mat-chip>
+              </mat-chip-set>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="priority">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              mat-sort-header
+            >
+              Priority
+            </th>
+            <td
+              mat-cell
+              *matCellDef="let task"
+            >
+              @if (task.priority !== undefined) {
+                <mat-chip-set>
+                  <mat-chip [class]="'priority-' + getPriorityClass(task.priority)">
+                    {{ getPriorityLabel(task.priority) }}
+                  </mat-chip>
+                </mat-chip-set>
+              } @else {
+                <span class="no-priority">Not Set</span>
+              }
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="dueDate">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              mat-sort-header
+            >
+              Due Date
+            </th>
+            <td
+              mat-cell
+              *matCellDef="let task"
+            >
+              @if (task.dueDate) {
+                <span class="due-date">{{ task.dueDate | date: 'MMM dd, yyyy' }}</span>
+              } @else {
+                <span class="no-due-date">No due date</span>
+              }
+            </td>
+          </ng-container>
+
+          <tr
+            mat-header-row
+            *matHeaderRowDef="displayedColumns"
+          ></tr>
+          <tr
+            mat-row
+            *matRowDef="let row; columns: displayedColumns"
+          ></tr>
+
+          <tr
+            class="mat-mdc-row"
+            *matNoDataRow
+          >
+            <td
+              class="mat-mdc-cell"
+              [attr.colspan]="displayedColumns.length"
+            >
+              <div class="no-data-row">
+                <mat-icon class="no-data-icon">assignment</mat-icon>
+                <h3>No tasks found</h3>
+                <p>Try adjusting your search criteria or create a new task.</p>
+              </div>
+            </td>
+          </tr>
+        </table>
+
+        @if (paginationData()) {
+          <mat-paginator
+            [length]="paginationData()!.totalCount"
+            [pageSize]="paginationData()!.pageSize"
+            [pageIndex]="paginationData()!.pageIndex"
+            [pageSizeOptions]="[5, 10, 25, 50]"
+            (page)="onPageChange($event)"
+            showFirstLastButtons
+          ></mat-paginator>
+        }
+      }
+    </mat-card-content>
+  </mat-card>
 </div>

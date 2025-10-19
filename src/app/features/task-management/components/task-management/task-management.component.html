@@ -1,5 +1,5 @@
 <div class="container-fluid py-4">
-  <div class="row mb-4">
+  <div class="row mb-2">
     <div class="col-12">
       <div class="d-flex justify-content-between align-items-center">
         <div>
@@ -7,25 +7,15 @@
           @if (authService.user) {
             <p class="text-muted mb-0">
               <i class="bi bi-person-circle me-2"></i>
-              Welcome, <strong>{{ authService.user.username }}</strong
+              Welcome,
+              <strong>{{
+                authService.user.firstName || authService.user.username
+              }}</strong
               >!
             </p>
           }
         </div>
         <div class="d-flex gap-2">
-          <button
-            (click)="loadTasks()"
-            class="btn btn-info me-2"
-          >
-            <i class="bi bi-arrow-clockwise me-2"></i>Refresh Tasks
-          </button>
-          <button
-            (click)="onAddTask()"
-            class="btn btn-primary"
-            [disabled]="showForm()"
-          >
-            <i class="bi bi-plus-circle me-2"></i>Add Task
-          </button>
           <button
             (click)="onLogout()"
             class="btn btn-outline-danger"
@@ -56,33 +46,19 @@
     </div>
   }
 
-  <div class="row">
-    <div
-      class="col-lg-8"
-      [class.col-12]="!showForm()"
-    >
-      <app-task-list
-        [tasks]="tasks()"
-        [paginationData]="paginationData()"
-        [loading]="loading()"
-        (editTask)="onEditTask($event)"
-        (deleteTask)="onDeleteTask($event)"
-        (pageChange)="onPageChange($event)"
-        (searchChange)="onSearchChange($event)"
-        (sortChange)="onSortChange($event)"
-      ></app-task-list>
-    </div>
-
-    <div
-      class="col-lg-4"
-      [class.d-none]="!showForm()"
-    >
-      <app-task-form
-        [task]="selectedTask()"
-        [loading]="formLoading()"
-        (saveTask)="onSaveTask($event)"
-        (taskCancel)="onCancelForm()"
-      ></app-task-form>
-    </div>
-  </div>
+  <app-task-list
+    [tasks]="tasks()"
+    [paginationData]="paginationData()"
+    [loading]="loading()"
+    [currentSort]="getCurrentSort()"
+    (addTask)="onAddTask()"
+    (editTask)="onEditTask()"
+    (deleteTask)="onDeleteTask($event)"
+    (pageChange)="onPageChange($event)"
+    (searchChange)="onSearchChange($event)"
+    (statusFilterChange)="onStatusFilterChange($event)"
+    (priorityFilterChange)="onPriorityFilterChange($event)"
+    (sortChange)="onSortChange($event)"
+    (refreshTasks)="loadTasks()"
+  ></app-task-list>
 </div>

@@ -1,10 +1,13 @@
 import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { PageEvent } from '@angular/material/paginator';
 import { AuthService } from '@core/services';
 import { Task, TaskFilter } from '@features/task-management/models';
 import { TaskService } from '@features/task-management/services';
+import { ConfirmationDialogComponent } from '@shared/components/confirmation-dialog/confirmation-dialog.component';
 import { DataResponse } from '@shared/models';
 import { Subscription } from 'rxjs';
-import { TaskFormComponent, TaskListComponent } from '../';
+import { TaskListComponent } from '../';
 
 export enum MessageType {
   Success = 'success',
@@ -15,7 +18,7 @@ export enum MessageType {
 @Component({
   selector: 'app-task-management',
   standalone: true,
-  imports: [TaskListComponent, TaskFormComponent],
+  imports: [TaskListComponent],
   templateUrl: './task-management.component.html',
   styleUrl: './task-management.component.scss',
 })
@@ -23,14 +26,12 @@ export class TaskManagementComponent implements OnInit, OnDestroy {
   tasks = signal<Task[]>([]);
   paginationData = signal<DataResponse<Task> | null>(null);
   loading = signal<boolean>(false);
-  formLoading = signal<boolean>(false);
-  showForm = signal<boolean>(false);
-  selectedTask = signal<Task | null>(null);
   message = signal<string>('');
   messageType = signal<MessageType>(MessageType.Info);
 
   authService = inject(AuthService);
   #taskService = inject(TaskService);
+  #dialog = inject(MatDialog);
   #subscriptions = new Set<Subscription>();
 
   #appliedFilter: TaskFilter = {
@@ -39,6 +40,8 @@ export class TaskManagementComponent implements OnInit, OnDestroy {
     sortBy: '',
     sortDirection: 'asc',
     searchTerm: '',
+    status: undefined,
+    priority: undefined,
   };
 
   ngOnInit() {
@@ -54,49 +57,44 @@ export class TaskManagementComponent implements OnInit, OnDestroy {
         this.loading.set(false);
       },
       error: () => {
-        this.showMessage('Failed to load tasks', MessageType.Error);
-        this.loading.set(false);
+        // Fallback to queryable if paginated endpoint fails
+        this.#taskService.getFilteredQueryable(this.#appliedFilter).subscribe({
+          next: (response: Task[]) => {
+            this.tasks.set(response);
+            // Create mock pagination data
+            this.paginationData.set({
+              items: response,
+              pageSize: this.#appliedFilter.pageSize || 10,
+              pageIndex: this.#appliedFilter.pageIndex || 0,
+              totalCount: response.length,
+              totalPages: Math.ceil(
+                response.length / (this.#appliedFilter.pageSize || 10)
+              ),
+              hasPreviousPage: (this.#appliedFilter.pageIndex || 0) > 0,
+              hasNextPage:
+                (this.#appliedFilter.pageIndex || 0) <
+                Math.ceil(response.length / (this.#appliedFilter.pageSize || 10)) - 1,
+            });
+            this.loading.set(false);
+          },
+          error: () => {
+            this.showMessage('Failed to load tasks', MessageType.Error);
+            this.loading.set(false);
+          },
+        });
       },
     });
     this.#subscriptions.add(subscription);
   }
 
   onAddTask() {
-    this.selectedTask.set(null);
-    this.showForm.set(true);
+    this.showMessage('Task created successfully', MessageType.Success);
+    this.loadTasks();
   }
 
-  onEditTask(task: Task) {
-    this.selectedTask.set(task);
-    this.showForm.set(true);
-  }
-
-  onSaveTask(task: Task) {
-    this.formLoading.set(true);
-
-    const operation = task.id
-      ? this.#taskService.update(task.id, task)
-      : this.#taskService.create(task);
-
-    const subscription = operation.subscribe({
-      next: () => {
-        this.showMessage(
-          task.id ? 'Task updated successfully' : 'Task created successfully',
-          MessageType.Success
-        );
-        this.formLoading.set(false);
-        this.onCancelForm();
-        this.loadTasks();
-      },
-      error: () => {
-        this.showMessage(
-          task.id ? 'Failed to update task' : 'Failed to create task',
-          MessageType.Error
-        );
-        this.formLoading.set(false);
-      },
-    });
-    this.#subscriptions.add(subscription);
+  onEditTask() {
+    this.showMessage('Task updated successfully', MessageType.Success);
+    this.loadTasks();
   }
 
   onDeleteTask(task: Task) {
@@ -114,13 +112,9 @@ export class TaskManagementComponent implements OnInit, OnDestroy {
     this.#subscriptions.add(subscription);
   }
 
-  onCancelForm() {
-    this.showForm.set(false);
-    this.selectedTask.set(null);
-  }
-
-  onPageChange(page: number) {
-    this.#appliedFilter.pageIndex = page;
+  onPageChange(event: PageEvent) {
+    this.#appliedFilter.pageIndex = event.pageIndex;
+    this.#appliedFilter.pageSize = event.pageSize;
     this.loadTasks();
   }
 
@@ -130,11 +124,33 @@ export class TaskManagementComponent implements OnInit, OnDestroy {
     this.loadTasks();
   }
 
+  onStatusFilterChange(status: number | null) {
+    this.#appliedFilter.status = status || undefined;
+    this.#appliedFilter.pageIndex = 0;
+    this.loadTasks();
+  }
+
+  onPriorityFilterChange(priority: number | null) {
+    this.#appliedFilter.priority = priority || undefined;
+    this.#appliedFilter.pageIndex = 0;
+    this.loadTasks();
+  }
+
   onSortChange(sort: { sortBy: string; sortDirection: 'asc' | 'desc' }) {
     this.#appliedFilter.sortBy = sort.sortBy;
     this.#appliedFilter.sortDirection = sort.sortDirection;
     this.#appliedFilter.pageIndex = 0;
     this.loadTasks();
+  }
+
+  getCurrentSort() {
+    if (this.#appliedFilter.sortBy && this.#appliedFilter.sortDirection) {
+      return {
+        sortBy: this.#appliedFilter.sortBy,
+        sortDirection: this.#appliedFilter.sortDirection,
+      };
+    }
+    return null;
   }
 
   showMessage(text: string, type: MessageType) {
@@ -151,9 +167,20 @@ export class TaskManagementComponent implements OnInit, OnDestroy {
   }
 
   onLogout() {
-    if (confirm('Are you sure you want to logout?')) {
-      this.authService.logout();
-    }
+    const dialogRef = this.#dialog.open(ConfirmationDialogComponent, {
+      width: '400px',
+      data: {
+        title: 'Logout',
+        message:
+          'Are you sure you want to logout? You will need to sign in again to access your tasks.',
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.authService.logout();
+      }
+    });
   }
 
   ngOnDestroy() {
