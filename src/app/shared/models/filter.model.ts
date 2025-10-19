@@ -1,8 +1,5 @@
-export interface Filter {
+import { PaginationRequest } from '../models';
+
+export interface Filter extends PaginationRequest {
   userId?: string;
-  searchTerm?: string;
-  pageIndex?: number;
-  pageSize?: number;
-  sortBy?: string;
-  sortDirection?: 'asc' | 'desc';
 }

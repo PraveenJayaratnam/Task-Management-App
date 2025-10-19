@@ -4,7 +4,7 @@
       mat-raised-button
       color="primary"
       (click)="onAdd()"
-      class="add-task-button"
+      class="add-task-button mb-2"
     >
       <mat-icon>add</mat-icon>
       Add Task
@@ -12,7 +12,7 @@
   </div>
 
   <div
-    class="filter-section"
+    class="filter-section mt-2"
     [formGroup]="filterForm"
   >
     <mat-form-field
@@ -24,7 +24,7 @@
       <input
         matInput
         formControlName="searchTerm"
-        placeholder="Enter search term..."
+        placeholder="Search..."
         autocomplete="off"
       />
       <mat-icon matSuffix>search</mat-icon>
@@ -56,7 +56,7 @@
       </mat-select>
     </mat-form-field>
 
-    <div class="filter-buttons-wrapper mb-4">
+    <div class="filter-buttons-wrapper mb-2 ms-2">
       <div class="button-group">
         <button
           mat-stroked-button
