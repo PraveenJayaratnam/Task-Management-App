@@ -9,16 +9,13 @@
     "skipLibCheck": true,
     "isolatedModules": true,
     "experimentalDecorators": true,
-    "esModuleInterop": true,
     "importHelpers": true,
     "target": "ES2022",
-    "module": "esnext",
-    "moduleResolution": "node",
-    "baseUrl": "./",
+    "module": "preserve",
     "paths": {
-      "@features/*": ["src/app/features/index.ts"],
-      "@core/*": ["src/app/core/index.ts"],
-      "@shared/*": ["src/app/shared/index.ts"]
+      "@features/*": ["./src/app/features/index.ts"],
+      "@core/*": ["./src/app/core/index.ts"],
+      "@shared/*": ["./src/app/shared/index.ts"]
     }
   },
   "angularCompilerOptions": {
