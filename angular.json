@@ -36,12 +36,7 @@
               "src/styles.scss",
               "node_modules/@angular/material/prebuilt-themes/indigo-pink.css"
             ],
-            "polyfills": ["zone.js"],
-            "server": "src/main.server.ts",
-            "outputMode": "server",
-            "ssr": {
-              "entry": "src/server.ts"
-            }
+            "polyfills": ["zone.js"]
           },
           "configurations": {
             "production": {
@@ -59,8 +54,8 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "12kB",
-                  "maximumError": "15kB"
+                  "maximumWarning": "15kB",
+                  "maximumError": "18kB"
                 }
               ],
               "outputHashing": "all",

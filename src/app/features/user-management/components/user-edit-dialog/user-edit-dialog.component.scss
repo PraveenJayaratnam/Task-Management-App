@@ -1,20 +1,23 @@
+@use '../../../../shared/styles/variables' as *;
+
 .user-edit-dialog {
   .user-form {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: $spacing-xs;
     min-width: 400px;
   }
 
   .full-width {
     width: 100%;
+    margin-bottom: 0;
   }
 
   .status-field {
-    margin-top: 8px;
+    margin-top: 0;
 
     .status-checkbox {
-      font-size: 16px;
+      font-size: $table-font-size-sm;
     }
   }
 }

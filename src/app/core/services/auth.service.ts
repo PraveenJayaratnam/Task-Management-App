@@ -34,16 +34,11 @@ export class AuthService extends BaseApiService {
       };
 
       this.#authState.set(newState);
-      if (typeof window !== 'undefined' && window.localStorage) {
-        localStorage.setItem('user', JSON.stringify(loginResponse.user));
-      }
+      localStorage.setItem('user', JSON.stringify(loginResponse.user));
     }
   }
 
   #getStoredUser(): User | null {
-    if (typeof window === 'undefined' || !window.localStorage) {
-      return null;
-    }
     const storedUser = localStorage.getItem('user');
     return storedUser ? JSON.parse(storedUser) : null;
   }
@@ -55,9 +50,7 @@ export class AuthService extends BaseApiService {
     };
 
     this.#authState.set(newState);
-    if (typeof window !== 'undefined' && window.localStorage) {
-      localStorage.removeItem('user');
-    }
+    localStorage.removeItem('user');
     this.#router.navigate(['/login']);
   }
 
@@ -77,8 +70,6 @@ export class AuthService extends BaseApiService {
       isAuthenticated: false,
     };
     this.#authState.set(newState);
-    if (typeof window !== 'undefined' && window.localStorage) {
-      localStorage.removeItem('user');
-    }
+    localStorage.removeItem('user');
   }
 }

@@ -1,6 +1,6 @@
 import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
-import { Task, TaskFilter } from '@features/task-management/models';
+import { Task, TaskFilter, TaskStatus } from '@features/task-management/models';
 import { TaskService } from '@features/task-management/services';
 import { MessageType } from '@shared/enums';
 import { DataResponse } from '@shared/models';
@@ -74,6 +74,26 @@ export class TaskManagementComponent implements OnInit, OnDestroy {
       },
       error: () => {
         this.showMessage('Failed to delete task', MessageType.Error);
+      },
+    });
+    this.#subscriptions.add(subscription);
+  }
+
+  onMarkAsCompleted(task: Task) {
+    if (!task.id) return;
+
+    const updateTask = {
+      ...task,
+      status: TaskStatus.Completed,
+    };
+
+    const subscription = this.#taskService.update(task.id, updateTask).subscribe({
+      next: () => {
+        this.showMessage('Task marked as completed successfully', MessageType.Success);
+        this.loadTasks();
+      },
+      error: () => {
+        this.showMessage('Failed to mark task as completed', MessageType.Error);
       },
     });
     this.#subscriptions.add(subscription);
