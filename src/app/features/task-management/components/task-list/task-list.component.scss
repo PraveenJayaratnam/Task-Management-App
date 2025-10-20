@@ -56,13 +56,21 @@
   margin: 0 20px 20px 20px;
   width: calc(100% - 40px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  @media (min-width: 768px) and (max-width: 1024px) {
+    margin: 0 20px 24px 20px;
+
+    mat-card-content {
+      padding: $spacing-lg;
+    }
+  }
 }
 
 .filter-section {
   padding: $spacing-sm;
   display: flex;
   flex-direction: column;
-  gap: $spacing-xs;
+  gap: $spacing-md;
   align-items: stretch;
   width: 100%;
   overflow-x: hidden;
@@ -70,11 +78,16 @@
   @media (min-width: $breakpoint-sm) {
     flex-direction: row;
     align-items: center;
-    gap: $spacing-xs;
+    gap: $spacing-sm;
     padding: $spacing-xs $spacing-sm;
   }
   @media (min-width: $breakpoint-md) {
     padding: $spacing-sm;
+  }
+
+  @media (min-width: 768px) and (max-width: 1024px) {
+    gap: $spacing-lg;
+    padding: $spacing-md;
   }
 }
 
@@ -86,6 +99,10 @@
   align-items: center;
   @media (min-width: $breakpoint-sm) {
     max-width: 350px;
+  }
+
+  @media (min-width: 768px) and (max-width: 1024px) {
+    margin-bottom: $spacing-sm;
   }
   mat-form-field {
     width: 100%;
@@ -169,6 +186,8 @@
   @media (max-width: $breakpoint-sm) {
     width: 100%;
     justify-content: stretch;
+    flex-direction: column;
+    gap: $spacing-sm;
   }
 }
 
@@ -203,9 +222,13 @@
 
 .small-button {
   height: 45px !important;
-  min-width: 100px !important;
+  width: 100% !important;
   font-size: 14px !important;
   padding: 0 12px !important;
+  flex: 1;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 
   mat-icon {
     font-size: 18px !important;
@@ -215,13 +238,24 @@
   }
 
   @media (max-width: $breakpoint-sm) {
-    width: 100%;
-    min-width: unset !important;
+    width: 100% !important;
+    flex: 1;
   }
 }
 
+.reset-filters-button,
 .refresh-tasks-button {
-  min-width: 100px !important;
+  height: 45px !important;
+  width: 100% !important;
+  flex: 1;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  @media (max-width: $breakpoint-sm) {
+    width: 100% !important;
+    flex: none;
+  }
 }
 
 .loading-container {
@@ -564,14 +598,60 @@ mat-paginator {
   .empty-state {
     margin: 0 10px;
   }
-  mat-paginator .mat-mdc-paginator-container {
-    padding: 12px 16px;
-    flex-direction: column;
-    gap: 8px;
-    .mat-mdc-paginator-page-size {
-      margin-bottom: 8px;
+
+  mat-paginator {
+    .mat-mdc-paginator-container {
+      padding: 12px 16px;
+      flex-direction: column;
+      gap: 12px;
+      align-items: center;
+
+      .mat-mdc-paginator-page-size {
+        order: 2;
+        margin-bottom: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+
+        .mat-mdc-paginator-page-size-label {
+          font-size: 12px;
+          text-align: center;
+        }
+
+        .mat-mdc-paginator-page-size-select {
+          min-width: 80px;
+        }
+      }
+
+      .mat-mdc-paginator-range-label {
+        order: 1;
+        font-size: 12px;
+        text-align: center;
+        margin-bottom: 4px;
+      }
+
+      .mat-mdc-paginator-navigation {
+        order: 3;
+        display: flex;
+        justify-content: center;
+        gap: 4px;
+
+        .mat-mdc-icon-button {
+          width: 36px;
+          height: 36px;
+          line-height: 36px;
+
+          .mat-mdc-paginator-icon {
+            font-size: 18px;
+            width: 18px;
+            height: 18px;
+          }
+        }
+      }
     }
   }
+
   table .mat-mdc-cell {
     padding: 12px 8px;
   }
@@ -583,5 +663,63 @@ mat-paginator {
 @media (max-width: 600px) {
   .displayed-columns .mat-column-description {
     display: none;
+  }
+
+  mat-paginator {
+    .mat-mdc-paginator-container {
+      padding: 8px 12px;
+      gap: 8px;
+
+      .mat-mdc-paginator-page-size {
+        .mat-mdc-paginator-page-size-label {
+          font-size: 11px;
+        }
+
+        .mat-mdc-paginator-page-size-select {
+          min-width: 70px;
+          font-size: 12px;
+        }
+      }
+
+      .mat-mdc-paginator-range-label {
+        font-size: 11px;
+        line-height: 1.2;
+      }
+
+      .mat-mdc-paginator-navigation {
+        gap: 2px;
+
+        .mat-mdc-icon-button {
+          width: 32px;
+          height: 32px;
+          line-height: 32px;
+
+          .mat-mdc-paginator-icon {
+            font-size: 16px;
+            width: 16px;
+            height: 16px;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  mat-paginator {
+    .mat-mdc-paginator-container {
+      .mat-mdc-paginator-page-size {
+        .mat-mdc-paginator-page-size-label {
+          display: none;
+        }
+      }
+
+      .mat-mdc-paginator-navigation {
+        .mat-mdc-paginator-navigation-previous,
+        .mat-mdc-paginator-navigation-next {
+          display: none;
+        }
+      }
+    }
   }
 }
