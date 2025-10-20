@@ -138,7 +138,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     this.message.set(text);
     this.messageType.set(type);
 
-    if (type === 'success') {
+    if (type === MessageType.Success) {
       setTimeout(() => this.clearMessage(), 3000);
     }
   }

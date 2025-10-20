@@ -100,6 +100,7 @@ export class TaskListComponent implements OnInit, AfterViewInit, OnDestroy {
   addTask = output<void>();
   editTask = output<Task>();
   deleteTask = output<Task>();
+  markAsCompleted = output<Task>();
   pageChange = output<PageEvent>();
   searchChange = output<string>();
   statusFilterChange = output<number | null>();
@@ -111,9 +112,10 @@ export class TaskListComponent implements OnInit, AfterViewInit, OnDestroy {
   refreshTasks = output<void>();
 
   filterForm!: FormGroup;
-  Math = Math;
-  taskStatusOptions = TASK_STATUS_OPTIONS;
-  taskPriorityOptions = TASK_PRIORITY_OPTIONS;
+
+  readonly taskStatus = TaskStatus;
+  readonly taskStatusOptions = TASK_STATUS_OPTIONS;
+  readonly taskPriorityOptions = TASK_PRIORITY_OPTIONS;
 
   displayedColumns: string[] = [
     'actions',
@@ -290,6 +292,23 @@ export class TaskListComponent implements OnInit, AfterViewInit, OnDestroy {
     const dialogSubscription = dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.deleteTask.emit(task);
+      }
+    });
+    this.#subscriptions.add(dialogSubscription);
+  }
+
+  onMarkAsCompleted(task: Task) {
+    const dialogRef = this.#dialog.open(ConfirmationDialogComponent, {
+      width: '400px',
+      data: {
+        title: 'Mark as Completed',
+        message: `Are you sure you want to mark "${task.title}" as completed?`,
+      },
+    });
+
+    const dialogSubscription = dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.markAsCompleted.emit(task);
       }
     });
     this.#subscriptions.add(dialogSubscription);

@@ -39,7 +39,7 @@
   }
 
   .add-task-button {
-    height: 40px !important;
+    height: 42px !important;
     font-size: 14px !important;
     padding: 0 16px !important;
 
@@ -52,16 +52,19 @@
   }
 }
 
+.filter-card {
+  margin: 0 20px 20px 20px;
+  width: calc(100% - 40px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
 .filter-section {
-  margin: 0 $spacing-lg $spacing-sm $spacing-lg;
   padding: $spacing-sm;
   display: flex;
   flex-direction: column;
   gap: $spacing-xs;
   align-items: stretch;
-  background: $background-secondary;
-  border-radius: $border-radius-small;
-  width: calc(100% - #{$spacing-xl});
+  width: 100%;
   overflow-x: hidden;
   max-width: 100%;
   @media (min-width: $breakpoint-sm) {
@@ -71,8 +74,6 @@
     padding: $spacing-xs $spacing-sm;
   }
   @media (min-width: $breakpoint-md) {
-    margin: 0 $spacing-xl $spacing-sm $spacing-xl;
-    width: calc(100% - #{$spacing-xxl});
     padding: $spacing-sm;
   }
 }
@@ -105,7 +106,7 @@
     }
   }
   input {
-    font-size: 16px;
+    font-size: $table-font-size-sm;
     &::placeholder {
       color: #999;
       font-style: italic;
@@ -116,6 +117,35 @@
     cursor: pointer;
     &:hover {
       color: #007bff;
+    }
+  }
+}
+
+::ng-deep {
+  .search-field,
+  .filter-field {
+    .mat-mdc-form-field-infix {
+      min-height: 40px !important;
+      padding: 8px 0 !important;
+    }
+    .mat-mdc-text-field-wrapper {
+      height: 44px !important;
+    }
+    .mat-mdc-form-field-outline {
+      height: 44px !important;
+    }
+    .mat-mdc-form-field-outline-start,
+    .mat-mdc-form-field-outline-end {
+      height: 44px !important;
+    }
+    .mat-mdc-form-field-outline-thick {
+      height: 44px !important;
+    }
+    .mat-mdc-form-field-subscript-wrapper {
+      display: none !important;
+    }
+    .mat-mdc-form-field-label {
+      font-size: $table-font-size-sm !important;
     }
   }
 }
@@ -172,7 +202,7 @@
 }
 
 .small-button {
-  height: 40px !important;
+  height: 45px !important;
   min-width: 100px !important;
   font-size: 14px !important;
   padding: 0 12px !important;
@@ -234,52 +264,56 @@
     font-weight: $font-weight-semibold;
     color: $text-primary;
     border-bottom: 2px solid $border-light;
-    font-size: $mobile-font-size;
-    padding: $spacing-sm;
+    font-size: $table-font-size-sm;
+    padding: $spacing-xs;
+    min-height: 40px;
     @media (min-width: $breakpoint-sm) {
-      font-size: $font-size-sm;
-      padding: $spacing-md;
+      font-size: $table-font-size-md;
+      padding: $spacing-sm;
     }
   }
   .mat-mdc-row {
     transition: background-color $transition-fast;
+    min-height: 48px;
     &:hover {
       background: $background-secondary;
     }
   }
   .mat-mdc-cell {
-    padding: $spacing-sm;
+    padding: $spacing-xs;
     border-bottom: 1px solid $border-light;
-    font-size: $mobile-font-size;
+    font-size: $table-font-size-sm;
     word-wrap: break-word;
     @media (min-width: $breakpoint-sm) {
-      padding: $spacing-md $spacing-sm;
-      font-size: $font-size-sm;
+      padding: $spacing-sm $spacing-xs;
+      font-size: $table-font-size-md;
     }
   }
 }
 
 .task-title {
-  font-weight: 500;
-  color: #333;
-  font-size: 16px;
+  font-weight: $font-weight-medium;
+  color: $text-primary;
+  font-size: $table-font-size-md;
 }
 .task-description {
-  color: #666;
-  font-size: 14px;
+  color: $text-secondary;
+  font-size: $table-font-size-xs;
   max-width: 300px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .due-date {
-  color: #333;
-  font-weight: 500;
+  color: $text-primary;
+  font-weight: $font-weight-medium;
+  font-size: $table-font-size-sm;
 }
 .no-due-date,
 .no-priority {
-  color: #999;
+  color: $text-muted;
   font-style: italic;
+  font-size: $table-font-size-xs;
 }
 
 .status-warning {
@@ -369,6 +403,37 @@
   }
 }
 
+.mark-completed-action {
+  color: #28a745;
+  mat-icon {
+    color: #28a745;
+  }
+}
+
+::ng-deep {
+  .mat-mdc-menu-panel {
+    .mat-mdc-menu-item {
+      min-height: 32px !important;
+      height: 32px !important;
+      font-size: $table-font-size-sm !important;
+      line-height: 1.2 !important;
+      padding: $spacing-xs $spacing-sm !important;
+
+      .mat-icon {
+        font-size: $font-size-sm !important;
+        width: $font-size-sm !important;
+        height: $font-size-sm !important;
+        margin-right: $spacing-sm !important;
+      }
+
+      .mat-mdc-menu-item-text {
+        font-size: $table-font-size-sm !important;
+        line-height: 1.2 !important;
+      }
+    }
+  }
+}
+
 ::ng-deep {
   .actions-cell .mat-mdc-icon-button {
     background: transparent !important;
@@ -389,9 +454,16 @@
   .priority-warning mat-chip,
   .priority-danger mat-chip {
     color: $white !important;
+    min-height: 24px !important;
+    height: 24px !important;
+    font-size: $table-font-size-sm !important;
+    padding: 4px 8px !important;
+    border-radius: 12px !important;
     .mat-mdc-chip-text,
     .mat-mdc-chip-text-content {
       color: $white !important;
+      font-size: $table-font-size-sm !important;
+      line-height: 1.3 !important;
     }
   }
 }

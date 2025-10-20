@@ -27,25 +27,27 @@
 .task-form {
   display: flex;
   flex-direction: column;
-  gap: $spacing-lg;
-  padding: $spacing-lg 0;
+  gap: $spacing-xs;
+  padding: $spacing-xs 0;
 
   @media (min-width: $breakpoint-sm) {
-    gap: $spacing-xxl;
-    padding: $spacing-xxl 0;
+    gap: $spacing-sm;
+    padding: $spacing-sm 0;
   }
 }
 
 .form-row {
   display: flex;
   flex-direction: column;
-  gap: $spacing-md;
+  gap: 0;
   align-items: stretch;
+  margin-bottom: $spacing-xs;
 
   @media (min-width: $breakpoint-sm) {
     flex-direction: row;
-    gap: $spacing-xl;
+    gap: $spacing-xs;
     align-items: flex-start;
+    margin-bottom: $spacing-sm;
   }
 }
 
@@ -156,13 +158,14 @@ mat-dialog-actions button {
 
 textarea {
   resize: none;
-  min-height: 100px;
-  max-height: 140px;
+  min-height: 60px;
+  max-height: 80px;
   overflow-y: auto;
   border-radius: $border-radius-medium;
-  padding: $spacing-md;
+  padding: $spacing-sm;
   border: 1px solid $border-color;
   transition: all $transition-normal;
+  font-size: $table-font-size-sm;
 
   &:focus {
     border-color: $primary-color;
