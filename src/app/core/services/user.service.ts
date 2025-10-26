@@ -17,22 +17,22 @@ export interface UserResponse {
   providedIn: 'root',
 })
 export class UserService extends BaseApiService {
-  private readonly apiUrl = 'users';
+  #apiUrl = 'Users';
 
   getUsers(): Observable<UserResponse[]> {
-    return this.getEntity<UserResponse[]>(this.apiUrl);
+    return this.getEntity<UserResponse[]>(`${this.#apiUrl}`);
   }
 
   getUserById(id: string): Observable<UserResponse> {
-    return this.getEntity<UserResponse>(`${this.apiUrl}/${id}`);
+    return this.getEntity<UserResponse>(`${this.#apiUrl}/${id}`);
   }
 
   updateUser(id: string, updateUserDto: UpdateUserDto): Observable<UserResponse> {
-    return this.putEntity<UserResponse>(`${this.apiUrl}/${id}`, updateUserDto);
+    return this.putEntity<UserResponse>(`${this.#apiUrl}/${id}`, updateUserDto);
   }
 
   deleteUser(id: string): Observable<void> {
-    return this.deleteEntity<void>(`${this.apiUrl}/${id}`);
+    return this.deleteEntity<void>(`${this.#apiUrl}/${id}`);
   }
 
   mapToUser(response: UserResponse): User {

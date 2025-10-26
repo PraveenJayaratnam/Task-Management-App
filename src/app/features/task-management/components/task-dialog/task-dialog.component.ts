@@ -109,8 +109,6 @@ export class TaskDialogComponent implements OnInit, OnDestroy {
     this.taskForm.markAllAsTouched();
 
     if (!this.taskForm.valid) {
-      console.log('Form is invalid:', this.taskForm.errors);
-      console.log('Form controls:', this.taskForm.controls);
       return;
     }
 

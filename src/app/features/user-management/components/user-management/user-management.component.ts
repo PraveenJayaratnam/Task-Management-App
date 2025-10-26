@@ -5,7 +5,7 @@ import { User } from '@core/models';
 import { AuthService, UserService } from '@core/services';
 import { ConfirmationDialogComponent } from '@shared/components/confirmation-dialog/confirmation-dialog.component';
 import { MessageType } from '@shared/enums';
-import { Subscription } from 'rxjs';
+import { catchError, of, Subscription } from 'rxjs';
 import { UserEditDialogComponent } from '../user-edit-dialog/user-edit-dialog.component';
 
 @Component({
@@ -32,19 +32,25 @@ export class UserManagementComponent implements OnInit, OnDestroy {
 
   loadUsers() {
     this.loading.set(true);
-    const subscription = this.userService.getUsers().subscribe({
-      next: (response) => {
-        const users = response.map((user) => this.userService.mapToUser(user));
-        this.users.set(users);
-        this.loading.set(false);
-      },
-      error: (error) => {
-        console.error('Error loading users:', error);
-        const errorMessage = this.getErrorMessage(error);
-        this.showMessage(errorMessage || 'Failed to load users', MessageType.Error);
-        this.loading.set(false);
-      },
-    });
+    const subscription = this.userService
+      .getUsers()
+      .pipe(
+        catchError((error) => {
+          const errorMessage = this.getErrorMessage(error);
+          this.showMessage(errorMessage || 'Failed to load users', MessageType.Error);
+          this.loading.set(false);
+          return of(null);
+        })
+      )
+      .subscribe({
+        next: (response) => {
+          if (response) {
+            const users = response.map((user) => this.userService.mapToUser(user));
+            this.users.set(users);
+          }
+          this.loading.set(false);
+        },
+      });
     this.#subscriptions.add(subscription);
   }
 
@@ -59,17 +65,26 @@ export class UserManagementComponent implements OnInit, OnDestroy {
 
     const dialogSubscription = dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        const subscription = this.userService.deleteUser(user.id!).subscribe({
-          next: () => {
-            this.users.update((users) => users.filter((u) => u.id !== user.id));
-            this.showMessage('User deleted successfully', MessageType.Success);
-          },
-          error: (error) => {
-            console.error('Error deleting user:', error);
-            const errorMessage = this.getErrorMessage(error);
-            this.showMessage(errorMessage || 'Failed to delete user', MessageType.Error);
-          },
-        });
+        const subscription = this.userService
+          .deleteUser(user.id!)
+          .pipe(
+            catchError((error) => {
+              const errorMessage = this.getErrorMessage(error);
+              this.showMessage(
+                errorMessage || 'Failed to delete user',
+                MessageType.Error
+              );
+              return of(null);
+            })
+          )
+          .subscribe({
+            next: (response) => {
+              if (response !== null) {
+                this.users.update((users) => users.filter((u) => u.id !== user.id));
+                this.showMessage('User deleted successfully', MessageType.Success);
+              }
+            },
+          });
         this.#subscriptions.add(subscription);
       }
     });
@@ -88,46 +103,63 @@ export class UserManagementComponent implements OnInit, OnDestroy {
       if (result && result.action === 'update') {
         const updateDto = this.userService.mapToUpdateDto(result.user);
 
-        const subscription = this.userService.updateUser(user.id!, updateDto).subscribe({
-          next: () => {
-            this.showMessage(
-              `User ${user.firstName} ${user.lastName} updated successfully`,
-              MessageType.Success
-            );
+        const subscription = this.userService
+          .updateUser(user.id!, updateDto)
+          .pipe(
+            catchError((error) => {
+              const errorMessage = this.getErrorMessage(error);
+              this.showMessage(
+                errorMessage || 'Failed to update user',
+                MessageType.Error
+              );
+              return of(null);
+            })
+          )
+          .subscribe({
+            next: (response) => {
+              if (response !== null) {
+                this.showMessage(
+                  `User ${user.firstName} ${user.lastName} updated successfully`,
+                  MessageType.Success
+                );
 
-            const currentUser = this.authService.user;
-            if (currentUser && currentUser.id === user.id) {
-              const getUserSubscription = this.userService
-                .getUserById(user.id!)
-                .subscribe({
-                  next: (updatedUser) => {
-                    const mappedUser = this.userService.mapToUser(updatedUser);
-                    if (!mappedUser.isActive) {
-                      this.showMessage(
-                        'Your account has been deactivated. You will be logged out.',
-                        MessageType.Info
-                      );
-                      this.authService.logout();
-                    } else {
-                      this.loadUsers();
-                    }
-                  },
-                  error: (error) => {
-                    console.error('Error fetching updated user:', error);
-                    this.loadUsers();
-                  },
-                });
-              this.#subscriptions.add(getUserSubscription);
-            } else {
-              this.loadUsers();
-            }
-          },
-          error: (error) => {
-            console.error('Error updating user:', error);
-            const errorMessage = this.getErrorMessage(error);
-            this.showMessage(errorMessage || 'Failed to update user', MessageType.Error);
-          },
-        });
+                const currentUser = this.authService.user;
+                if (currentUser && currentUser.id === user.id) {
+                  const getUserSubscription = this.userService
+                    .getUserById(user.id!)
+                    .pipe(
+                      catchError((error) => {
+                        const errorMessage = this.getErrorMessage(error);
+                        this.showMessage(
+                          errorMessage || 'Failed to get user',
+                          MessageType.Error
+                        );
+                        return of(null);
+                      })
+                    )
+                    .subscribe({
+                      next: (updatedUser) => {
+                        if (updatedUser) {
+                          const mappedUser = this.userService.mapToUser(updatedUser);
+                          if (!mappedUser.isActive) {
+                            this.showMessage(
+                              'Your account has been deactivated. You will be logged out.',
+                              MessageType.Info
+                            );
+                            this.authService.logout();
+                          } else {
+                            this.loadUsers();
+                          }
+                        }
+                      },
+                    });
+                  this.#subscriptions.add(getUserSubscription);
+                } else {
+                  this.loadUsers();
+                }
+              }
+            },
+          });
         this.#subscriptions.add(subscription);
       }
     });
