@@ -12,7 +12,6 @@
   display: flex;
   align-items: center;
   padding: $spacing-xl $spacing-xl $spacing-lg $spacing-xl;
-  background: linear-gradient(135deg, $danger-color 0%, #d32f2f 100%);
   color: $white;
 
   .icon-container {
@@ -25,7 +24,8 @@
     border-radius: 50%;
     margin-right: $spacing-md;
 
-    .warning-icon {
+    .warning-icon,
+    .confirm-icon {
       font-size: 24px;
       width: 24px;
       height: 24px;
@@ -40,6 +40,14 @@
     margin: 0;
     flex: 1;
   }
+}
+
+.dialog-destructive .dialog-header {
+  background: linear-gradient(135deg, $danger-color 0%, #d32f2f 100%);
+}
+
+.dialog-confirm .dialog-header {
+  background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
 }
 
 .dialog-content {
@@ -89,29 +97,48 @@
     display: flex;
     align-items: center;
     gap: $spacing-xs;
-    background: linear-gradient(135deg, $danger-color 0%, #d32f2f 100%);
     color: $white;
     font-weight: $font-weight-semibold;
     border-radius: $border-radius-small;
     transition: all $transition-normal;
-    box-shadow: 0 2px 8px rgba($danger-color, 0.3);
-
-    &:hover {
-      background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba($danger-color, 0.4);
-    }
-
-    &:active {
-      transform: translateY(0);
-      box-shadow: 0 2px 8px rgba($danger-color, 0.3);
-    }
 
     mat-icon {
       font-size: 18px;
       width: 18px;
       height: 18px;
     }
+  }
+}
+
+.dialog-destructive .dialog-actions .confirm-button {
+  background: linear-gradient(135deg, $danger-color 0%, #d32f2f 100%);
+  box-shadow: 0 2px 8px rgba($danger-color, 0.3);
+
+  &:hover {
+    background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba($danger-color, 0.4);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba($danger-color, 0.3);
+  }
+}
+
+.dialog-confirm .dialog-actions .confirm-button {
+  background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+
+  &:hover {
+    background: linear-gradient(135deg, #388e3c 0%, #2e7d32 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
   }
 }
 

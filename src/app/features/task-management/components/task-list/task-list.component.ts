@@ -232,6 +232,7 @@ export class TaskListComponent implements OnInit, AfterViewInit, OnDestroy {
       data: {
         title: 'Delete Task',
         message: `Are you sure you want to delete "${task.title}"? This action cannot be undone.`,
+        type: 'destructive',
       },
     });
 
@@ -249,6 +250,7 @@ export class TaskListComponent implements OnInit, AfterViewInit, OnDestroy {
       data: {
         title: 'Mark as Completed',
         message: `Are you sure you want to mark "${task.title}" as completed?`,
+        type: 'confirm',
       },
     });
 

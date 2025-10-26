@@ -60,6 +60,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
       data: {
         title: 'Delete User',
         message: `Are you sure you want to delete ${user.firstName} ${user.lastName}? This action cannot be undone.`,
+        type: 'destructive',
       },
     });
 
@@ -92,85 +93,108 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   }
 
   onEditUser(user: User) {
-    const dialogRef = this.dialog.open(UserEditDialogComponent, {
-      width: '500px',
-      data: {
-        user: user,
-      },
-    });
+    if (!user.id) return;
 
-    const dialogSubscription = dialogRef.afterClosed().subscribe((result) => {
-      if (result && result.action === 'update') {
-        const updateDto = this.userService.mapToUpdateDto(result.user);
+    const subscription = this.userService
+      .getUserById(user.id)
+      .pipe(
+        catchError((error) => {
+          const errorMessage = this.getErrorMessage(error);
+          this.showMessage(
+            errorMessage || 'Failed to load user details',
+            MessageType.Error
+          );
+          return of(null);
+        })
+      )
+      .subscribe({
+        next: (userData) => {
+          if (userData) {
+            const mappedUser = this.userService.mapToUser(userData);
+            const dialogRef = this.dialog.open(UserEditDialogComponent, {
+              width: '500px',
+              data: {
+                user: mappedUser,
+              },
+            });
 
-        const subscription = this.userService
-          .updateUser(user.id!, updateDto)
-          .pipe(
-            catchError((error) => {
-              const errorMessage = this.getErrorMessage(error);
-              this.showMessage(
-                errorMessage || 'Failed to update user',
-                MessageType.Error
-              );
-              return of(null);
-            })
-          )
-          .subscribe({
-            next: (response) => {
-              if (response !== null) {
-                this.showMessage(
-                  `User ${user.firstName} ${user.lastName} updated successfully`,
-                  MessageType.Success
-                );
+            const dialogSubscription = dialogRef.afterClosed().subscribe((result) => {
+              if (result && result.action === 'update') {
+                const updateDto = this.userService.mapToUpdateDto(result.user);
 
-                const currentUser = this.authService.user;
-                if (currentUser && currentUser.id === user.id) {
-                  const getUserSubscription = this.userService
-                    .getUserById(user.id!)
-                    .pipe(
-                      catchError((error) => {
-                        const errorMessage = this.getErrorMessage(error);
+                const updateSubscription = this.userService
+                  .updateUser(user.id!, updateDto)
+                  .pipe(
+                    catchError((error) => {
+                      const errorMessage = this.getErrorMessage(error);
+                      this.showMessage(
+                        errorMessage || 'Failed to update user',
+                        MessageType.Error
+                      );
+                      return of(null);
+                    })
+                  )
+                  .subscribe({
+                    next: (response) => {
+                      if (response !== null) {
                         this.showMessage(
-                          errorMessage || 'Failed to get user',
-                          MessageType.Error
+                          `User ${user.firstName} ${user.lastName} updated successfully`,
+                          MessageType.Success
                         );
-                        return of(null);
-                      })
-                    )
-                    .subscribe({
-                      next: (updatedUser) => {
-                        if (updatedUser) {
-                          const mappedUser = this.userService.mapToUser(updatedUser);
-                          if (!mappedUser.isActive) {
-                            this.showMessage(
-                              'Your account has been deactivated. You will be logged out.',
-                              MessageType.Info
-                            );
-                            this.authService.logout();
-                          } else {
-                            this.loadUsers();
-                          }
+
+                        const currentUser = this.authService.user;
+                        if (currentUser && currentUser.id === user.id) {
+                          const getUserSubscription = this.userService
+                            .getUserById(user.id!)
+                            .pipe(
+                              catchError((error) => {
+                                const errorMessage = this.getErrorMessage(error);
+                                this.showMessage(
+                                  errorMessage || 'Failed to get user',
+                                  MessageType.Error
+                                );
+                                return of(null);
+                              })
+                            )
+                            .subscribe({
+                              next: (updatedUser) => {
+                                if (updatedUser) {
+                                  const mappedUser =
+                                    this.userService.mapToUser(updatedUser);
+                                  if (!mappedUser.isActive) {
+                                    this.showMessage(
+                                      'Your account has been deactivated. You will be logged out.',
+                                      MessageType.Info
+                                    );
+                                    this.authService.logout();
+                                  } else {
+                                    this.loadUsers();
+                                  }
+                                }
+                              },
+                            });
+                          this.#subscriptions.add(getUserSubscription);
+                        } else {
+                          this.loadUsers();
                         }
-                      },
-                    });
-                  this.#subscriptions.add(getUserSubscription);
-                } else {
-                  this.loadUsers();
-                }
+                      }
+                    },
+                  });
+                this.#subscriptions.add(updateSubscription);
               }
-            },
-          });
-        this.#subscriptions.add(subscription);
-      }
-    });
-    this.#subscriptions.add(dialogSubscription);
+            });
+            this.#subscriptions.add(dialogSubscription);
+          }
+        },
+      });
+    this.#subscriptions.add(subscription);
   }
 
   showMessage(text: string, type: MessageType) {
     this.message.set(text);
     this.messageType.set(type);
 
-    if (type === MessageType.Success) {
+    if (type === MessageType.Success || type === MessageType.Error) {
       setTimeout(() => this.clearMessage(), 3000);
     }
   }

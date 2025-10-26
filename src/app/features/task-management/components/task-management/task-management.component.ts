@@ -100,40 +100,60 @@ export class TaskManagementComponent implements OnInit, OnDestroy {
   }
 
   onEditTask(task: Task) {
-    const dialogRef = this.#dialog.open(TaskDialogComponent, {
-      width: '600px',
-      maxWidth: '90vw',
-      maxHeight: '90vh',
-      disableClose: false,
-      autoFocus: true,
-      data: {
-        task: task,
-        isEdit: true,
-      },
-    });
+    if (!task.id) return;
 
-    const dialogSubscription = dialogRef.afterClosed().subscribe((result) => {
-      if (result && result.action === 'update') {
-        const updateSubscription = this.#taskService
-          .update(result.id, result.task)
-          .pipe(
-            catchError(() => {
-              this.showMessage('Failed to update task', MessageType.Error);
-              return of(null);
-            })
-          )
-          .subscribe({
-            next: (response) => {
-              if (response !== null) {
-                this.showMessage('Task updated successfully', MessageType.Success);
-                this.loadTasks();
+    const subscription = this.#taskService
+      .getById(task.id)
+      .pipe(
+        catchError(() => {
+          this.showMessage('Failed to load task details', MessageType.Error);
+          return of(null);
+        })
+      )
+      .subscribe({
+        next: (taskData) => {
+          if (taskData) {
+            const dialogRef = this.#dialog.open(TaskDialogComponent, {
+              width: '600px',
+              maxWidth: '90vw',
+              maxHeight: '90vh',
+              disableClose: false,
+              autoFocus: true,
+              data: {
+                task: taskData,
+                isEdit: true,
+              },
+            });
+
+            const dialogSubscription = dialogRef.afterClosed().subscribe((result) => {
+              if (result && result.action === 'update') {
+                const updateSubscription = this.#taskService
+                  .update(result.id, result.task)
+                  .pipe(
+                    catchError(() => {
+                      this.showMessage('Failed to update task', MessageType.Error);
+                      return of(null);
+                    })
+                  )
+                  .subscribe({
+                    next: (response) => {
+                      if (response !== null) {
+                        this.showMessage(
+                          'Task updated successfully',
+                          MessageType.Success
+                        );
+                        this.loadTasks();
+                      }
+                    },
+                  });
+                this.#subscriptions.add(updateSubscription);
               }
-            },
-          });
-        this.#subscriptions.add(updateSubscription);
-      }
-    });
-    this.#subscriptions.add(dialogSubscription);
+            });
+            this.#subscriptions.add(dialogSubscription);
+          }
+        },
+      });
+    this.#subscriptions.add(subscription);
   }
 
   onDeleteTask(task: Task) {
@@ -161,27 +181,42 @@ export class TaskManagementComponent implements OnInit, OnDestroy {
   onMarkAsCompleted(task: Task) {
     if (!task.id) return;
 
-    const updateTask = {
-      ...task,
-      status: TaskStatus.Completed,
-    };
-
     const subscription = this.#taskService
-      .update(task.id, updateTask)
+      .getById(task.id)
       .pipe(
         catchError(() => {
-          this.showMessage('Failed to mark task as completed', MessageType.Error);
+          this.showMessage('Failed to load task details', MessageType.Error);
           return of(null);
         })
       )
       .subscribe({
-        next: (response) => {
-          if (response !== null) {
-            this.showMessage(
-              'Task marked as completed successfully',
-              MessageType.Success
-            );
-            this.loadTasks();
+        next: (taskData) => {
+          if (taskData && taskData.id) {
+            const updateTask = {
+              ...taskData,
+              status: TaskStatus.Completed,
+            };
+
+            const updateSubscription = this.#taskService
+              .update(taskData.id, updateTask)
+              .pipe(
+                catchError(() => {
+                  this.showMessage('Failed to mark task as completed', MessageType.Error);
+                  return of(null);
+                })
+              )
+              .subscribe({
+                next: (response) => {
+                  if (response !== null) {
+                    this.showMessage(
+                      'Task marked as completed successfully',
+                      MessageType.Success
+                    );
+                    this.loadTasks();
+                  }
+                },
+              });
+            this.#subscriptions.add(updateSubscription);
           }
         },
       });
@@ -238,7 +273,7 @@ export class TaskManagementComponent implements OnInit, OnDestroy {
     this.message.set(text);
     this.messageType.set(type);
 
-    if (type === MessageType.Success) {
+    if (type === MessageType.Success || type === MessageType.Error) {
       setTimeout(() => this.clearMessage(), 3000);
     }
   }

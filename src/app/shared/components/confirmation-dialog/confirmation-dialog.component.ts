@@ -1,3 +1,4 @@
+import { NgClass } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { MatButton } from '@angular/material/button';
 import {
@@ -13,12 +14,20 @@ export interface ConfirmationDialogData {
   title?: string;
   message?: string;
   confirmText?: string;
+  type?: 'destructive' | 'confirm';
 }
 
 @Component({
   selector: 'app-confirmation-dialog',
   standalone: true,
-  imports: [MatDialogTitle, MatDialogContent, MatDialogActions, MatButton, MatIcon],
+  imports: [
+    MatButton,
+    MatDialogActions,
+    MatDialogContent,
+    MatDialogTitle,
+    MatIcon,
+    NgClass,
+  ],
   templateUrl: './confirmation-dialog.component.html',
   styleUrl: './confirmation-dialog.component.scss',
 })
@@ -36,6 +45,10 @@ export class ConfirmationDialogComponent {
 
   get confirmText(): string {
     return this.data.confirmText || 'Confirm';
+  }
+
+  get type(): 'destructive' | 'confirm' {
+    return this.data.type || 'destructive';
   }
 
   onConfirm() {
