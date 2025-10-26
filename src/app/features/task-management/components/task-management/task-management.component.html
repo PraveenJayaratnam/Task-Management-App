@@ -35,7 +35,7 @@
     [loading]="loading()"
     [currentSort]="getCurrentSort()"
     (addTask)="onAddTask()"
-    (editTask)="onEditTask()"
+    (editTask)="onEditTask($event)"
     (deleteTask)="onDeleteTask($event)"
     (markAsCompleted)="onMarkAsCompleted($event)"
     (pageChange)="onPageChange($event)"

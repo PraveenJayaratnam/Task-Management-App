@@ -7,6 +7,7 @@ import { AuthState, LoginRequest, LoginResponse, RegisterRequest, User } from '.
   providedIn: 'root',
 })
 export class AuthService extends BaseApiService {
+  #apiUrl = 'Auth';
   #authState = signal<AuthState>({
     user: this.#getStoredUser(),
     isAuthenticated: !!this.#getStoredUser(),
@@ -23,7 +24,7 @@ export class AuthService extends BaseApiService {
   }
 
   login(loginRequest: LoginRequest) {
-    return this.postEntity<LoginResponse>('auth/login', loginRequest);
+    return this.postEntity<LoginResponse>(`${this.#apiUrl}/login`, loginRequest);
   }
 
   setAuthState(loginResponse: LoginResponse) {
@@ -55,12 +56,12 @@ export class AuthService extends BaseApiService {
   }
 
   register(registerRequest: RegisterRequest) {
-    return this.postEntity<User>('auth/register', registerRequest);
+    return this.postEntity<User>(`${this.#apiUrl}/register`, registerRequest);
   }
 
   checkUsernameExists(username: string) {
     return this.getEntity<{ exists: boolean; username: string }>(
-      `auth/check-username?username=${encodeURIComponent(username)}`
+      `${this.#apiUrl}/check-username?username=${encodeURIComponent(username)}`
     );
   }
 

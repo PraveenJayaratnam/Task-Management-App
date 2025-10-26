@@ -12,37 +12,33 @@ import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class TaskService extends BaseApiService {
-  #baseUrl = 'tasks';
+  #apiUrl = 'Tasks';
 
   getAll(): Observable<Task[]> {
-    return this.getEntity<Task[]>(`${this.#baseUrl}/queryable`);
+    return this.getEntity<Task[]>(`${this.#apiUrl}/all`);
   }
 
   getList(filter?: TaskFilter): Observable<DataResponse<Task>> {
     const queryString = QueryHelper.buildQuery(filter);
     const url = queryString
-      ? `${this.#baseUrl}/paginated?${queryString}`
-      : `${this.#baseUrl}/paginated`;
+      ? `${this.#apiUrl}/paginated?${queryString}`
+      : `${this.#apiUrl}/paginated`;
     return this.getEntity<DataResponse<Task>>(url);
   }
 
   getById(id: string): Observable<Task> {
-    return this.getEntity<Task>(`${this.#baseUrl}/${id}`);
+    return this.getEntity<Task>(`${this.#apiUrl}/${id}`);
   }
 
   create(createTask: CreateTask): Observable<Task> {
-    return this.postEntity<Task>(this.#baseUrl, createTask);
+    return this.postEntity<Task>(this.#apiUrl, createTask);
   }
 
   update(id: string, updateTask: UpdateTask): Observable<Task> {
-    return this.putEntity<Task>(`${this.#baseUrl}/${id}`, updateTask);
+    return this.putEntity<Task>(`${this.#apiUrl}/${id}`, updateTask);
   }
 
   delete(id: string): Observable<void> {
-    return this.deleteEntity<void>(`${this.#baseUrl}/${id}`);
-  }
-
-  getTasksByUser(userId: string): Observable<Task[]> {
-    return this.getEntity<Task[]>(`${this.#baseUrl}/queryable?userId=${userId}`);
+    return this.deleteEntity<void>(`${this.#apiUrl}/${id}`);
   }
 }

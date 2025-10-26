@@ -1,7 +1,12 @@
-<div class="confirmation-dialog">
+<div
+  class="confirmation-dialog"
+  [ngClass]="'dialog-' + type"
+>
   <div class="dialog-header">
     <div class="icon-container">
-      <mat-icon class="warning-icon">warning</mat-icon>
+      <mat-icon [class]="type === 'destructive' ? 'warning-icon' : 'confirm-icon'">
+        {{ type === 'destructive' ? 'warning' : 'check_circle' }}
+      </mat-icon>
     </div>
     <h2
       mat-dialog-title
@@ -30,7 +35,7 @@
     </button>
     <button
       mat-raised-button
-      color="warn"
+      [color]="type === 'destructive' ? 'warn' : 'primary'"
       (click)="onConfirm()"
       type="button"
       class="confirm-button"

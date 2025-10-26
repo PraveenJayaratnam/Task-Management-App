@@ -100,6 +100,7 @@ export class UserEditDialogComponent implements OnInit {
           title: 'Unsaved Changes',
           message: 'You have unsaved changes. Are you sure you want to cancel?',
           confirmText: 'Yes, Cancel',
+          type: 'destructive',
         },
         width: '400px',
       });

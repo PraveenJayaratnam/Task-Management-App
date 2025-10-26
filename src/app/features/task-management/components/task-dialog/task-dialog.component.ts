@@ -109,8 +109,6 @@ export class TaskDialogComponent implements OnInit, OnDestroy {
     this.taskForm.markAllAsTouched();
 
     if (!this.taskForm.valid) {
-      console.log('Form is invalid:', this.taskForm.errors);
-      console.log('Form controls:', this.taskForm.controls);
       return;
     }
 
@@ -160,6 +158,7 @@ export class TaskDialogComponent implements OnInit, OnDestroy {
           title: 'Unsaved Changes',
           message: 'You have unsaved changes. Are you sure you want to cancel?',
           confirmText: 'Yes, Cancel',
+          type: 'destructive',
         },
         width: '400px',
       });

@@ -43,11 +43,9 @@ import {
   TaskPriority,
   TaskStatus,
 } from '@features/task-management/models';
-import { TaskService } from '@features/task-management/services';
 import { ConfirmationDialogComponent } from '@shared/components/confirmation-dialog/confirmation-dialog.component';
 import { DataResponse } from '@shared/models';
 import { Subscription } from 'rxjs';
-import { TaskDialogComponent } from '../task-dialog/task-dialog.component';
 
 @Component({
   selector: 'app-task-list',
@@ -128,7 +126,6 @@ export class TaskListComponent implements OnInit, AfterViewInit, OnDestroy {
 
   #fb = inject(FormBuilder);
   #dialog = inject(MatDialog);
-  #taskService = inject(TaskService);
   #subscriptions = new Set<Subscription>();
 
   ngOnInit() {
@@ -222,62 +219,11 @@ export class TaskListComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onAdd() {
-    const dialogRef = this.#dialog.open(TaskDialogComponent, {
-      width: '600px',
-      maxWidth: '90vw',
-      maxHeight: '90vh',
-      disableClose: false,
-      autoFocus: true,
-      data: {
-        isEdit: false,
-      },
-    });
-
-    const dialogSubscription = dialogRef.afterClosed().subscribe((result) => {
-      if (result && result.action === 'create') {
-        const createSubscription = this.#taskService.create(result.task).subscribe({
-          next: () => {
-            this.addTask.emit();
-          },
-          error: (error) => {
-            console.error('Error creating task:', error);
-          },
-        });
-        this.#subscriptions.add(createSubscription);
-      }
-    });
-    this.#subscriptions.add(dialogSubscription);
+    this.addTask.emit();
   }
 
   onEdit(task: Task) {
-    const dialogRef = this.#dialog.open(TaskDialogComponent, {
-      width: '600px',
-      maxWidth: '90vw',
-      maxHeight: '90vh',
-      disableClose: false,
-      autoFocus: true,
-      data: {
-        task: task,
-        isEdit: true,
-      },
-    });
-
-    const dialogSubscription = dialogRef.afterClosed().subscribe((result) => {
-      if (result && result.action === 'update') {
-        const updateSubscription = this.#taskService
-          .update(result.id, result.task)
-          .subscribe({
-            next: () => {
-              this.editTask.emit({ id: result.id, ...result.task });
-            },
-            error: (error) => {
-              console.error('Error updating task:', error);
-            },
-          });
-        this.#subscriptions.add(updateSubscription);
-      }
-    });
-    this.#subscriptions.add(dialogSubscription);
+    this.editTask.emit(task);
   }
 
   onDelete(task: Task) {
@@ -286,6 +232,7 @@ export class TaskListComponent implements OnInit, AfterViewInit, OnDestroy {
       data: {
         title: 'Delete Task',
         message: `Are you sure you want to delete "${task.title}"? This action cannot be undone.`,
+        type: 'destructive',
       },
     });
 
@@ -303,6 +250,7 @@ export class TaskListComponent implements OnInit, AfterViewInit, OnDestroy {
       data: {
         title: 'Mark as Completed',
         message: `Are you sure you want to mark "${task.title}" as completed?`,
+        type: 'confirm',
       },
     });
 

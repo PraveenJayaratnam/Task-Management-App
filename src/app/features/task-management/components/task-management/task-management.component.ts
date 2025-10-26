@@ -1,11 +1,12 @@
 import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { Task, TaskFilter, TaskStatus } from '@features/task-management/models';
 import { TaskService } from '@features/task-management/services';
 import { MessageType } from '@shared/enums';
 import { DataResponse } from '@shared/models';
-import { Subscription } from 'rxjs';
-import { TaskListComponent } from '../../components';
+import { catchError, of, Subscription } from 'rxjs';
+import { TaskDialogComponent, TaskListComponent } from '../../components';
 
 @Component({
   selector: 'app-task-management',
@@ -22,13 +23,14 @@ export class TaskManagementComponent implements OnInit, OnDestroy {
   messageType = signal<MessageType>(MessageType.Info);
 
   #taskService = inject(TaskService);
+  #dialog = inject(MatDialog);
   #subscriptions = new Set<Subscription>();
 
   #appliedFilter: TaskFilter = {
     pageIndex: 0,
     pageSize: 10,
-    sortBy: '',
-    sortDirection: 'asc',
+    sortBy: 'createdAt',
+    sortDirection: 'desc',
     searchTerm: '',
     status: undefined,
     priority: undefined,
@@ -40,62 +42,184 @@ export class TaskManagementComponent implements OnInit, OnDestroy {
 
   loadTasks() {
     this.loading.set(true);
-    const subscription = this.#taskService.getList(this.#appliedFilter).subscribe({
-      next: (response: DataResponse<Task>) => {
-        this.tasks.set(response.items);
-        this.paginationData.set(response);
-        this.loading.set(false);
-      },
-      error: () => {
-        this.showMessage('Failed to load tasks', MessageType.Error);
-        this.loading.set(false);
-      },
-    });
+    const subscription = this.#taskService
+      .getList(this.#appliedFilter)
+      .pipe(
+        catchError(() => {
+          this.showMessage('Failed to load tasks', MessageType.Error);
+          this.loading.set(false);
+          return of(null);
+        })
+      )
+      .subscribe({
+        next: (response: DataResponse<Task> | null) => {
+          if (response) {
+            this.tasks.set(response.items);
+            this.paginationData.set(response);
+          }
+          this.loading.set(false);
+        },
+      });
     this.#subscriptions.add(subscription);
   }
 
   onAddTask() {
-    this.showMessage('Task created successfully', MessageType.Success);
-    this.loadTasks();
+    const dialogRef = this.#dialog.open(TaskDialogComponent, {
+      width: '600px',
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      disableClose: false,
+      autoFocus: true,
+      data: {
+        isEdit: false,
+      },
+    });
+
+    const dialogSubscription = dialogRef.afterClosed().subscribe((result) => {
+      if (result && result.action === 'create') {
+        const createSubscription = this.#taskService
+          .create(result.task)
+          .pipe(
+            catchError(() => {
+              this.showMessage('Failed to create task', MessageType.Error);
+              return of(null);
+            })
+          )
+          .subscribe({
+            next: (response) => {
+              if (response !== null) {
+                this.showMessage('Task created successfully', MessageType.Success);
+                this.loadTasks();
+              }
+            },
+          });
+        this.#subscriptions.add(createSubscription);
+      }
+    });
+    this.#subscriptions.add(dialogSubscription);
   }
 
-  onEditTask() {
-    this.showMessage('Task updated successfully', MessageType.Success);
-    this.loadTasks();
+  onEditTask(task: Task) {
+    if (!task.id) return;
+
+    const subscription = this.#taskService
+      .getById(task.id)
+      .pipe(
+        catchError(() => {
+          this.showMessage('Failed to load task details', MessageType.Error);
+          return of(null);
+        })
+      )
+      .subscribe({
+        next: (taskData) => {
+          if (taskData) {
+            const dialogRef = this.#dialog.open(TaskDialogComponent, {
+              width: '600px',
+              maxWidth: '90vw',
+              maxHeight: '90vh',
+              disableClose: false,
+              autoFocus: true,
+              data: {
+                task: taskData,
+                isEdit: true,
+              },
+            });
+
+            const dialogSubscription = dialogRef.afterClosed().subscribe((result) => {
+              if (result && result.action === 'update') {
+                const updateSubscription = this.#taskService
+                  .update(result.id, result.task)
+                  .pipe(
+                    catchError(() => {
+                      this.showMessage('Failed to update task', MessageType.Error);
+                      return of(null);
+                    })
+                  )
+                  .subscribe({
+                    next: (response) => {
+                      if (response !== null) {
+                        this.showMessage(
+                          'Task updated successfully',
+                          MessageType.Success
+                        );
+                        this.loadTasks();
+                      }
+                    },
+                  });
+                this.#subscriptions.add(updateSubscription);
+              }
+            });
+            this.#subscriptions.add(dialogSubscription);
+          }
+        },
+      });
+    this.#subscriptions.add(subscription);
   }
 
   onDeleteTask(task: Task) {
     if (!task.id) return;
 
-    const subscription = this.#taskService.delete(task.id).subscribe({
-      next: () => {
-        this.showMessage('Task deleted successfully', MessageType.Success);
-        this.loadTasks();
-      },
-      error: () => {
-        this.showMessage('Failed to delete task', MessageType.Error);
-      },
-    });
+    const subscription = this.#taskService
+      .delete(task.id)
+      .pipe(
+        catchError(() => {
+          this.showMessage('Failed to delete task', MessageType.Error);
+          return of(null);
+        })
+      )
+      .subscribe({
+        next: (response) => {
+          if (response !== null) {
+            this.showMessage('Task deleted successfully', MessageType.Success);
+            this.loadTasks();
+          }
+        },
+      });
     this.#subscriptions.add(subscription);
   }
 
   onMarkAsCompleted(task: Task) {
     if (!task.id) return;
 
-    const updateTask = {
-      ...task,
-      status: TaskStatus.Completed,
-    };
+    const subscription = this.#taskService
+      .getById(task.id)
+      .pipe(
+        catchError(() => {
+          this.showMessage('Failed to load task details', MessageType.Error);
+          return of(null);
+        })
+      )
+      .subscribe({
+        next: (taskData) => {
+          if (taskData && taskData.id) {
+            const updateTask = {
+              ...taskData,
+              status: TaskStatus.Completed,
+            };
 
-    const subscription = this.#taskService.update(task.id, updateTask).subscribe({
-      next: () => {
-        this.showMessage('Task marked as completed successfully', MessageType.Success);
-        this.loadTasks();
-      },
-      error: () => {
-        this.showMessage('Failed to mark task as completed', MessageType.Error);
-      },
-    });
+            const updateSubscription = this.#taskService
+              .update(taskData.id, updateTask)
+              .pipe(
+                catchError(() => {
+                  this.showMessage('Failed to mark task as completed', MessageType.Error);
+                  return of(null);
+                })
+              )
+              .subscribe({
+                next: (response) => {
+                  if (response !== null) {
+                    this.showMessage(
+                      'Task marked as completed successfully',
+                      MessageType.Success
+                    );
+                    this.loadTasks();
+                  }
+                },
+              });
+            this.#subscriptions.add(updateSubscription);
+          }
+        },
+      });
     this.#subscriptions.add(subscription);
   }
 
@@ -124,8 +248,13 @@ export class TaskManagementComponent implements OnInit, OnDestroy {
   }
 
   onSortChange(sort: { sortBy: string; sortDirection: 'asc' | 'desc' }) {
-    this.#appliedFilter.sortBy = sort.sortBy;
-    this.#appliedFilter.sortDirection = sort.sortDirection;
+    if (!sort.sortBy || sort.sortBy === '') {
+      this.#appliedFilter.sortBy = 'createdAt';
+      this.#appliedFilter.sortDirection = 'desc';
+    } else {
+      this.#appliedFilter.sortBy = sort.sortBy;
+      this.#appliedFilter.sortDirection = sort.sortDirection;
+    }
     this.#appliedFilter.pageIndex = 0;
     this.loadTasks();
   }
@@ -144,7 +273,7 @@ export class TaskManagementComponent implements OnInit, OnDestroy {
     this.message.set(text);
     this.messageType.set(type);
 
-    if (type === MessageType.Success) {
+    if (type === MessageType.Success || type === MessageType.Error) {
       setTimeout(() => this.clearMessage(), 3000);
     }
   }
